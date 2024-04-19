@@ -1,6 +1,7 @@
 
 %{
   #include "y.tab.h"
+  void yyerror(char*);
   int count = 1;
 %}
 %%
@@ -15,12 +16,12 @@
                           return FLOATING;
                         }
                         
-(\"|\')[^$1]$1           {
+(\')[^$1]$1           {
                           yylval.string = yytext;
                           return CHAR;
                         }                        
 
-(\"|\')[^$1]*$1         {
+(\")[^$1]*$1         {
                           yylval.string = yytext;
                           return CHARARRAY;
                         }
@@ -30,7 +31,7 @@
                           return BOOLEAN;
                         }
 
-[-+/*(){}.=;&|~><(==)(!=)(<=)(>=)?:,] {
+[-+/*(){}.=;&|~><?:,] {
                                         yylval.string = yytext;
                                         return *yytext;
                                       }
@@ -58,15 +59,16 @@
 '=='            return EQ;
 '!='            return NE;
 
-[a-z_]+[a-zA-Z0-9_]*    { 
+[a-zA-Z_]+[a-zA-Z0-9_]*    {
                           yylval.sIndex = count++;
                           yylval.string = yytext;
                           return VARIABLE;
                         }
 
 [ \t\n]+        ;       /* ignore whitespace */
+\/\/.*          ;       /* ignore comments */
 
-.               yyerror("Unknown character");
+.              ; yyerror("Unknown character");
 %%
 int yywrap(void) {
     return 1;
