@@ -16,12 +16,12 @@
                           return FLOATING;
                         }
                         
-(\')[^$1]$1           {
+\'[^\']?\'               {
                           yylval.string = yytext;
                           return CHAR;
-                        }                        
+                        }                       
 
-(\")[^$1]*$1         {
+\"[^\"]*\"  {
                           yylval.string = yytext;
                           return CHARARRAY;
                         }
@@ -31,10 +31,10 @@
                           return BOOLEAN;
                         }
 
-[-+/*(){}.=;&|~><?:,] {
-                                        yylval.string = yytext;
-                                        return *yytext;
-                                      }
+[-+/*(){}.=;&|~><?:,]   {
+                          yylval.string = yytext;
+                          return *yytext;
+                        }
 
 "while"         return WHILE;
 "repeat"        return REPEAT;
@@ -59,7 +59,7 @@
 '=='            return EQ;
 '!='            return NE;
 
-[a-zA-Z_]+[a-zA-Z0-9_]*    {
+[a-zA-Z_][a-zA-Z0-9_]* {
                           yylval.sIndex = count++;
                           yylval.string = yytext;
                           return VARIABLE;

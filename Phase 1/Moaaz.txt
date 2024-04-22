@@ -1,0 +1,13 @@
+function int iterativefib(int n){
+    int fib1 = 0;
+    int fib2 = 1;
+    int fib;
+
+    for (int i = 0; i < n; i = i + 1) {
+        fib = fib1 + fib2;
+        fib2 = fib1;
+        fib1 = fib;
+    };
+    ret fib;
+
+};

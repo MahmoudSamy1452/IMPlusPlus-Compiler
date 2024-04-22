@@ -1,0 +1,56 @@
+function int add(int a, int b)
+{
+    ret a + b;
+};
+
+function int sub(int a, int b)
+{
+    ret a - b;
+};
+
+function int rec(int n)
+{
+    if (n == 5) then
+    {
+        ret n;
+    };
+    ret rec(n - 1);
+};
+
+function void main()
+{
+    int a = 5;
+    int b = 7;
+    if (b >= a) then
+    {
+        add(b,a);
+    };
+    else
+    {
+        sub(a,b);
+    };
+
+    int c = rec(34);
+    string s;
+    string fady = "";
+    switch(c)
+    {
+        case 5:
+        {
+            s = "5";
+        };
+        case 10:
+        {
+            s = "ten";
+        };
+        case 30:
+        {
+            s = "howa da";
+        };
+    };
+
+    for (int i = 0;i <= c; i++)
+    {
+        fady = s;
+    };
+};

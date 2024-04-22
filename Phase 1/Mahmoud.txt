@@ -1,0 +1,5 @@
+function int Hehe (int x , int y){
+  ret 0;
+};
+
+Hehe();
