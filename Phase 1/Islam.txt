@@ -24,7 +24,7 @@ function void main()
     if (b >= a) then
     {
         add(b,a);
-    };
+    }
     else
     {
         sub(a,b);
@@ -35,21 +35,21 @@ function void main()
     string fady = "";
     switch(c)
     {
-        case 5:
+        case 5+5:
         {
             s = "5";
-        };
-        case 10:
+        }
+        case 10 & 456789:
         {
             s = "ten";
-        };
-        case 30:
+        }
+        case 'c':
         {
             s = "howa da";
-        };
+        }
     };
 
-    for (int i = 0;i <= c; i++)
+    for (int i = 0;i <= c; i = i + 1)
     {
         fady = s;
     };

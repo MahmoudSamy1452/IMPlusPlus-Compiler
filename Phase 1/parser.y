@@ -17,7 +17,7 @@
 %token <string> CHAR CHARARRAY
 %token <string> VARIABLE
 %token WHILE REPEAT UNTIL FOR SWITCH CASE IF THEN ELSE FUNCTION RETURN INT FLOAT CHARACTER STRING BOOL VOID CONST GE LE EQ NE
-%type <value> expression
+%type <value> expression caseExpression
 
 %nonassoc '='
 %left '|'
@@ -39,19 +39,17 @@ declaration:
         datatype VARIABLE
         | datatype VARIABLE '=' assignmentValue        /*{ sym[$2] = $4; sym[$2].const = 0;}*/ /* check for redeclaration */
         | CONST datatype VARIABLE '=' assignmentValue  /*{ sym[$3].value = $5; sym[$3].const = 1; }*/
-        | datatype VARIABLE '=' VARIABLE '(' parameters ')'
-        | CONST datatype VARIABLE '=' VARIABLE '(' parameters ')'
         ;
 
 assignment:
         VARIABLE '=' assignmentValue                   /*{ sym[$1] = $3; }*/ /* check for const assignment */
-        | VARIABLE '=' VARIABLE '(' parameters ')'
         ;
 
 assignmentValue:
         expression
         | CHAR
         | CHARARRAY
+        | VARIABLE '(' parameters ')'
         ;
 
 initialization:
@@ -68,9 +66,11 @@ statement:
         | scope
         | IF '(' expression ')' THEN scope { printf("if\n");}
         | IF '(' expression ')' THEN scope ELSE scope { printf("if else\n");}
-        | FUNCTION datatype VARIABLE '(' arguments ')' funcScopeValue { printf("function\n");}
-        | FUNCTION VOID VARIABLE '(' arguments ')' funcScopeVoid { printf("function\n");}
+        | FUNCTION datatype VARIABLE '(' arguments ')' scope { printf("function\n");}
+        | FUNCTION VOID VARIABLE '(' arguments ')' scope { printf("function\n");}
         | VARIABLE '(' parameters ')' { printf("function call\n"); }
+        | RETURN assignmentValue
+        | RETURN
         ;
 
 argumentsList:
@@ -94,15 +94,40 @@ parameters:
         ;
 
 case:
-        CASE expression ':' scope { printf("case\n");}
-        | CASE expression ':' scope case { printf("case case\n");}
+        CASE caseCondition ':' scope { printf("case\n");}
+        | CASE caseCondition ':' scope case { printf("case case\n");}
+        ;
+
+caseCondition:
+        | CHAR
+        | caseExpression
+        ;
+
+caseExpression:
+        INTEGER
+        | BOOLEAN                       { printf("boolean\n");}
+        | caseExpression '<' caseExpression     { /*$$ = $1 < $3;*/ printf("less than\n");}
+        | caseExpression '>' caseExpression     { /*$$ = $1 > $3;*/ }
+        | caseExpression LE caseExpression      { /*$$ = $1 <= $3;*/ }
+        | caseExpression GE caseExpression      { /*$$ = $1 >= $3;*/}
+        | caseExpression EQ caseExpression      { /*$$ = $1 == $3;*/ }
+        | caseExpression NE caseExpression      { /*$$ = $1 != $3;*/}
+        | caseExpression '|' caseExpression     { /*$$ = $1 || $3;*/ }
+        | caseExpression '&' caseExpression     { /*$$ = $1 && $3;*/ }
+        | caseExpression '+' caseExpression     { /*$$ = $1 + $3;*/ printf("add\n");}
+        | caseExpression '-' caseExpression     { /*$$ = $1 - $3; printf("sub\n");*/}
+        | caseExpression '*' caseExpression     { /*$$ = $1 * $3; printf("mul\n");*/}
+        | caseExpression '/' caseExpression     { /*$$ = $1 / $3; printf("div\n");*/}
+        | '~' caseExpression                { /*$$ = !$2; */}
+        | '-' caseExpression                { /*$$ = -$2; */}
+        | '(' caseExpression ')'            { /*$$ = $2; */}
         ;
 
 expression:
-        INTEGER
-        | FLOATING
-        | BOOLEAN
-        | VARIABLE                      { /*$$ = 0;*/ printf("variable %s\n", $1);} // { $$ = sym[$1]; }
+        FLOATING
+        | INTEGER
+        | BOOLEAN                       { printf("boolean\n");}
+        | VARIABLE                      { /*$$ = 0*/ ; printf("variable\n");}
         | expression '<' expression     { /*$$ = $1 < $3;*/ printf("less than\n");}
         | expression '>' expression     { /*$$ = $1 > $3;*/ }
         | expression LE expression      { /*$$ = $1 <= $3;*/ }
@@ -119,7 +144,6 @@ expression:
         | '-' expression                { /*$$ = -$2; */}
         | '(' expression ')'            { /*$$ = $2; */}
         ;
-
 datatype:
         INT
         | FLOAT
@@ -132,22 +156,22 @@ scope:
         '{' program '}' { printf("scope\n");}
         ;
 
-funcScopeValue:
+/* funcScopeValue:
         '{' program returnValue program '}'
         ;
 
 funcScopeVoid:
         '{' program returnVoid program '}'
         | scope
-        ;
+        ; */
 
-returnValue:
-    RETURN expression ';' /* check return type */ { printf("return\n");}
-    ;
+/* returnValue:
+    RETURN assignmentValue ';' /* check return type  { printf("return\n");}
+    ; */
 
-returnVoid:
+/* returnVoid:
     RETURN ';'
-    ;
+    ; */
 
 %%
 

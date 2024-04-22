@@ -1,0 +1,18 @@
+func();
+
+function int main()
+{
+    float f = 267862.276781;
+    int g = 4567;
+
+    repeat
+    {
+        f = f / 2;
+    } until (f >= g);
+
+    for (int j = 10; j > 0; j = j - 1)
+    {
+        f = f + 1;
+    };
+
+};

@@ -54,12 +54,12 @@
 "string"        return STRING;
 "const"         return CONST;
 "void"          return VOID;
-'>='            return GE;
-'<='            return LE;
-'=='            return EQ;
-'!='            return NE;
+">="            return GE;
+"<="            return LE;
+"=="            return EQ;
+"!="            return NE;
 
-[a-zA-Z_][a-zA-Z0-9_]* {
+[a-zA-Z_][a-zA-Z0-9_]*  {
                           yylval.sIndex = count++;
                           yylval.string = yytext;
                           return VARIABLE;

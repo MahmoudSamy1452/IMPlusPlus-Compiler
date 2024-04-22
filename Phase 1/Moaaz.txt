@@ -11,3 +11,25 @@ function int iterativefib(int n){
     ret fib;
 
 };
+
+ret 0;
+
+// ana comment 
+
+while (True) {
+    int n;
+    const int x = 2;
+    repeat {
+        input(n);
+        for (int i = 0; i < n; i = i + 1) {
+            output(iterativefib(i));
+            ret 0;
+        };
+    } until (n >= 0);
+    output(iterativefib(n));
+};
+
+if (True & False & x == 2 | 3 > 5 | 5 >= 2) then {
+    output(0);
+    x = x +1 + 2 + 2+ 3 - 3 * (2 + 3) * 2;
+};
