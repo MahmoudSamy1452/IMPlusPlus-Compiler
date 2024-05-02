@@ -32,6 +32,18 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/* "%code requires" blocks.  */
+
+/* Line 1676 of yacc.c  */
+#line 1 "parser.y"
+
+    #include "SymbolTable.h"
+    #include "structs.h"
+
+
+
+/* Line 1676 of yacc.c  */
+#line 47 "y.tab.h"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -42,9 +54,9 @@
      INTEGER = 258,
      FLOATING = 259,
      BOOLEAN = 260,
-     CHAR = 261,
-     CHARARRAY = 262,
-     VARIABLE = 263,
+     VARIABLE = 261,
+     CHAR = 262,
+     CHARARRAY = 263,
      WHILE = 264,
      REPEAT = 265,
      UNTIL = 266,
@@ -54,28 +66,28 @@
      IF = 270,
      THEN = 271,
      ELSE = 272,
-     FUNCTION = 273,
-     RETURN = 274,
-     INT = 275,
-     FLOAT = 276,
-     CHARACTER = 277,
-     STRING = 278,
-     BOOL = 279,
-     VOID = 280,
-     CONST = 281,
-     GE = 282,
-     LE = 283,
-     EQ = 284,
-     NE = 285
+     RETURN = 273,
+     CONST = 274,
+     GE = 275,
+     LE = 276,
+     EQ = 277,
+     NE = 278,
+     VOID = 279,
+     FUNCTION = 280,
+     INT = 281,
+     FLOAT = 282,
+     BOOL = 283,
+     CHARACTER = 284,
+     STRING = 285
    };
 #endif
 /* Tokens.  */
 #define INTEGER 258
 #define FLOATING 259
 #define BOOLEAN 260
-#define CHAR 261
-#define CHARARRAY 262
-#define VARIABLE 263
+#define VARIABLE 261
+#define CHAR 262
+#define CHARARRAY 263
 #define WHILE 264
 #define REPEAT 265
 #define UNTIL 266
@@ -85,19 +97,19 @@
 #define IF 270
 #define THEN 271
 #define ELSE 272
-#define FUNCTION 273
-#define RETURN 274
-#define INT 275
-#define FLOAT 276
-#define CHARACTER 277
-#define STRING 278
-#define BOOL 279
-#define VOID 280
-#define CONST 281
-#define GE 282
-#define LE 283
-#define EQ 284
-#define NE 285
+#define RETURN 273
+#define CONST 274
+#define GE 275
+#define LE 276
+#define EQ 277
+#define NE 278
+#define VOID 279
+#define FUNCTION 280
+#define INT 281
+#define FLOAT 282
+#define BOOL 283
+#define CHARACTER 284
+#define STRING 285
 
 
 
@@ -107,16 +119,17 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 10 "parser.y"
+#line 15 "parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
-    char sIndex;                /* symbol table index */
+    Type type;                  /* data type */
+    Value* val;                 /* value */
 
 
 
 /* Line 1676 of yacc.c  */
-#line 120 "y.tab.h"
+#line 133 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

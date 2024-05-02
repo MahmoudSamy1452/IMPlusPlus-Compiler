@@ -1,25 +1,31 @@
+%code requires{
+    #include "SymbolTable.h"
+    #include "structs.h"
+}
+
 %{
     #include <stdio.h>
-    #include "SymbolTable.h"
     void yyerror(char *);
     int yylex(void);
     extern FILE *yyin;
     
-    SymbolTable* symTable;
-
+    SymbolTable* symTable = new SymbolTable();
 %}
 
 %union {
     float value;                /* float value */
     char* string;               /* string value */
-    char sIndex;                /* symbol table index */
+    Type type;                  /* data type */
+    Value* val;                 /* value */
 };
 
 %token <value> INTEGER FLOATING BOOLEAN
-%token <string> CHAR CHARARRAY
 %token <string> VARIABLE
-%token WHILE REPEAT UNTIL FOR SWITCH CASE IF THEN ELSE FUNCTION RETURN INT FLOAT CHARACTER STRING BOOL VOID CONST GE LE EQ NE
-%type <value> expression caseExpression
+%token <val> CHAR CHARARRAY
+%token WHILE REPEAT UNTIL FOR SWITCH CASE IF THEN ELSE RETURN CONST GE LE EQ NE VOID FUNCTION INT FLOAT BOOL CHARACTER STRING
+%type <value> caseExpression
+%type <type> datatype
+%type <val> assignmentValue expression
 
 %nonassoc '='
 %left '|'
@@ -38,20 +44,20 @@ program:
         ;
 
 declaration:
-        datatype VARIABLE
-        | datatype VARIABLE '=' assignmentValue        /*{ sym[$2] = $4; sym[$2].const = 0;}*/ /* check for redeclaration */
-        | CONST datatype VARIABLE '=' assignmentValue  /*{ sym[$3].value = $5; sym[$3].const = 1; }*/
+        datatype VARIABLE                               { symTable->insert($2, $1); printf("declaration\n");}
+        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4); printf("declaration = value\n");}
+        | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5, true); printf("const declaration\n");}
         ;
 
 assignment:
-        VARIABLE '=' assignmentValue                   /*{ sym[$1] = $3; }*/ /* check for const assignment */
+        VARIABLE '=' assignmentValue                    { symTable->setValue($1, $3); } /* check for const assignment*/
         ;
 
 assignmentValue:
         expression
         | CHAR
         | CHARARRAY
-        | VARIABLE '(' parameters ')'
+        | VARIABLE '(' parameters ')'                   { $$ = 0;printf("function call\n"); }
         ;
 
 initialization:
@@ -126,10 +132,10 @@ caseExpression:
         ;
 
 expression:
-        FLOATING
-        | INTEGER
-        | BOOLEAN                       { printf("boolean\n");}
-        | VARIABLE                      { /*$$ = 0*/ ; printf("variable\n");}
+        FLOATING                        { $$ = $1; printf("float\n");}
+        | INTEGER                       { $$ = $1; printf("integer\n");}
+        | BOOLEAN                       { $$ = $1; printf("boolean\n");}
+        | VARIABLE                      { $$ = symTable->getValue($1); printf("variable\n");}
         | expression '<' expression     { /*$$ = $1 < $3;*/ printf("less than\n");}
         | expression '>' expression     { /*$$ = $1 > $3;*/ }
         | expression LE expression      { /*$$ = $1 <= $3;*/ }
@@ -146,12 +152,13 @@ expression:
         | '-' expression                { /*$$ = -$2; */}
         | '(' expression ')'            { /*$$ = $2; */}
         ;
+
 datatype:
-        INT
-        | FLOAT
-        | BOOL
-        | CHARACTER
-        | STRING
+        INT                             { $$ = enum Type.INT; }
+        | FLOAT                         { $$ = enum Type.FLOAT; }
+        | BOOL                          { $$ = enum Type.BOOL; }
+        | CHARACTER                     { $$ = enum Type.CHAR; }
+        | STRING                        { $$ = enum Type.STRING; }  
         ;
 
 scope:

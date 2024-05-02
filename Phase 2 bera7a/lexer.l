@@ -1,40 +1,45 @@
+
 %{
   #include "y.tab.h"
-  #include "enums.h"
   #include "structs.h"
+  #include "enums.h"
   void yyerror(char*);
   int count = 1;
 %}
-
 %%
 
 ([1-9][0-9]*|0)         {
-                          yylval.val = {atoi(yytext), TYPE::INT};
+                          int* p = new int(atoi(yytext));
+                          yylval.val = new Value{p, Type::TYPE_INT};
                           return INTEGER;
                         }
 
 ([1-9][0-9]*|0)\.[0-9]+ {
-                          yylval.val = {atof(yytext), TYPE::FLOAT};
+                          double* p = new double(atof(yytext));
+                          yylval.val = new Value{p, Type::TYPE_FLOAT};
                           return FLOATING;
                         }
                         
-\'[^\']?\'               {
-                          yylval.val = {yytext, TYPE::CHAR};
+\'[^\']?\'              {
+                          char* p = new char(atof(yytext));
+                          yylval.val = new Value{p, Type::TYPE_CHAR};
                           return CHAR;
                         }                       
 
 \"[^\"]*\"              {
-                          yylval.val = {yytext, TYPE::CHAR_ARRAY};
-                          return STRING;
+                          yylval.val = new Value{(void*)yytext, Type::TYPE_CHAR_ARRAY};
+                          return CHARARRAY;
                         }
 
 ("True"|"False")        {
-                          yylval.val = {(yytext == "True" ? 1 : 0), TYPE::BOOL};
+
+                          int* p = new int(atoi(yytext));
+                          yylval.val = new Value{p, Type::TYPE_BOOL};
                           return BOOLEAN;
                         }
 
 [-+/*(){}.=;&|~><?:,]   {
-                          yylval.val = yytext;
+                          yylval.string = strdup(yytext);
                           return *yytext;
                         }
 
@@ -62,7 +67,8 @@
 "!="            return NE;
 
 [a-zA-Z_][a-zA-Z0-9_]*  {
-                          yylval.string = yytext;
+                          yylval.string = strdup(yytext);
+                          printf("Variable %s\n", yylval.string);
                           return VARIABLE;
                         }
 

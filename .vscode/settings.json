@@ -1,0 +1,21 @@
+{
+  "files.associations": {
+    "string": "cpp",
+    "*.tcc": "cpp",
+    "stdexcept": "cpp",
+    "regex": "cpp",
+    "array": "c",
+    "chrono": "c",
+    "functional": "c",
+    "istream": "c",
+    "ostream": "c",
+    "ratio": "c",
+    "scoped_allocator": "c",
+    "tuple": "c",
+    "type_traits": "c",
+    "utility": "c",
+    "optional": "c",
+    "system_error": "c",
+    "iostream": "cpp"
+  }
+}

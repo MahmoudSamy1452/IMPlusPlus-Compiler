@@ -32,6 +32,18 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/* "%code requires" blocks.  */
+
+/* Line 1676 of yacc.c  */
+#line 1 "parser.y"
+
+    #include "SymbolTable.h"
+    #include "structs.h"
+
+
+
+/* Line 1676 of yacc.c  */
+#line 47 "y.tab.h"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -39,11 +51,11 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     INTEGER = 258,
-     FLOATING = 259,
-     BOOLEAN = 260,
-     CHAR = 261,
-     CHARARRAY = 262,
+     CHAR = 258,
+     CHARARRAY = 259,
+     INTEGER = 260,
+     FLOATING = 261,
+     BOOLEAN = 262,
      VARIABLE = 263,
      WHILE = 264,
      REPEAT = 265,
@@ -70,11 +82,11 @@
    };
 #endif
 /* Tokens.  */
-#define INTEGER 258
-#define FLOATING 259
-#define BOOLEAN 260
-#define CHAR 261
-#define CHARARRAY 262
+#define CHAR 258
+#define CHARARRAY 259
+#define INTEGER 260
+#define FLOATING 261
+#define BOOLEAN 262
 #define VARIABLE 263
 #define WHILE 264
 #define REPEAT 265
@@ -107,16 +119,17 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 10 "parser.y"
+#line 17 "parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
-    char sIndex;                /* symbol table index */
+    Type type;
+    Value* val;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 120 "y.tab.h"
+#line 133 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
