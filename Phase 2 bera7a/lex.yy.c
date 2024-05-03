@@ -438,7 +438,7 @@ char *yytext;
   #include "y.tab.h"
   #include "structs.h"
   #include "enums.h"
-  void yyerror(char*);
+  void yyerror(const char*);
   int count = 1;
 #line 444 "lex.yy.c"
 
@@ -717,7 +717,7 @@ YY_RULE_SETUP
 #line 34 "lexer.l"
 {
 
-                          int* p = new int(atoi(yytext));
+                          int* p = new int(strcmp(yytext, "True") == 0 ? 1 : 0);
                           yylval.val = new Value{p, Type::TYPE_BOOL};
                           return BOOLEAN;
                         }

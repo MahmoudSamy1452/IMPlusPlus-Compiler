@@ -33,7 +33,7 @@
 
 ("True"|"False")        {
 
-                          int* p = new int(atoi(yytext));
+                          int* p = new int(strcmp(yytext, "True") == 0 ? 1 : 0);
                           yylval.val = new Value{p, Type::TYPE_BOOL};
                           return BOOLEAN;
                         }

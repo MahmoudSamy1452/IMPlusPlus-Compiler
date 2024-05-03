@@ -39,11 +39,14 @@
 
     #include "SymbolTable.h"
     #include "structs.h"
+    #include <stack>
+    #include <utility>
+    
 
 
 
 /* Line 1676 of yacc.c  */
-#line 47 "y.tab.h"
+#line 50 "y.tab.h"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -119,7 +122,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 17 "parser.y"
+#line 23 "parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
@@ -129,7 +132,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 133 "y.tab.h"
+#line 136 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

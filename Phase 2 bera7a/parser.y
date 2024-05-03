@@ -3,12 +3,14 @@
     #include "structs.h"
     #include <stack>
     #include <utility>
+    
 }
 
 %{
     #include <stdio.h>
     #include "structs.h"
     #include "SymbolTable.h"
+    #include "codeGenerator.h"
     void yyerror(const char *);
     void throwError(string);
     int yylex(void);
@@ -49,13 +51,13 @@ program:
 
 declaration:
         datatype VARIABLE                               { symTable->insert($2, $1); printf("declaration\n");}
-        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value); printf("%f", *(double*)($4->value));}
+        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value); printf("%f", *(double*)($4->value));cout << "MOV " << $2;}
         | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5->value, true); printf("const declaration");}
         ;
 
 
 assignment:
-        VARIABLE '=' assignmentValue                   { symTable->setValue($1, $3); }
+        VARIABLE '=' assignmentValue                   { symTable->setValue($1, $3); cout << "MOV" << $1; }
         ;
 
 assignmentValue:
@@ -154,7 +156,7 @@ caseExpression:
 
 expression:
         FLOATING
-        | INTEGER
+        | INTEGER                       {cout << "PUSH" << *(int*)$1->value << endl; $$ = $1;}
         | BOOLEAN
         | VARIABLE                     { $$ = new Value{symTable->getValue($1), symTable->getType($1)}; printf("test: %s", $1);}
         | expression '<' expression
@@ -163,14 +165,12 @@ expression:
         | expression GE expression      
         | expression EQ expression
         | expression NE expression      
-        | expression '|' expression     
-        | expression '&' expression    
-        | expression '+' expression    { int* sum = new int(*((int*)($1->value)) + *((int*)($3->value)));
-                $$ = new Value{(void*)sum, Type::TYPE_INT};}
-        | expression '-' expression    { int* minus = new int(*((int*)($1->value)) - *((int*)($3->value)));
-                $$ = new Value{(void*)minus, Type::TYPE_INT};}
-        | expression '*' expression     
-        | expression '/' expression     
+        | expression '|' expression     { cout << "add" << endl; $$ = $1;}
+        | expression '&' expression    { implementOperation($1, $3, OP::AND); $1->isTemp = true; $$ = $1;}
+        | expression '*' expression    { implementOperation($1, $3, OP::MULTIPLY); $1->isTemp = true; $$ = $1;}
+        | expression '/' expression     { cout << "div" << endl ; $$ = $1;}
+        | expression '+' expression    { cout << "add" << endl; $$ = $1;}
+        | expression '-' expression    { implementOperation($1, $3, OP::MINUS); $1->isTemp = true; $$ = $1;}
         | '~' expression             {$$ = $2;}         
         | '-' expression             {$$ = $2;}   
         | '(' expression ')'         {$$ = $2;}   
