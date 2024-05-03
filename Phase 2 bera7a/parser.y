@@ -3,6 +3,8 @@
     #include "structs.h"
     #include <stack>
     #include <utility>
+    #include <queue>
+    #include <string>
     
 }
 
@@ -17,7 +19,9 @@
     extern FILE *yyin;
 
     SymbolTable* symTable = new SymbolTable();
-    std::stack <std::pair<bool, Type>> funcStack;
+    std::stack<std::pair<bool, Type>> funcStack;
+    int forCount = 0;
+    std::queue<string> forQueue;
 %}
 
 %union {
@@ -50,21 +54,36 @@ program:
         ;
 
 declaration:
-        datatype VARIABLE                               { symTable->insert($2, $1); printf("declaration\n");}
-        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value); printf("%f", *(double*)($4->value));cout << "MOV " << $2;}
-        | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5->value, true); printf("const declaration");}
+        datatype VARIABLE                               { symTable->insert($2, $1); }
+        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value);
+                                                          if(forCount > 0)
+                                                            forQueue.push("POP " + (string)$2);
+                                                          else
+                                                              cout << "POP " << $2 << endl;
+                                                        }
+        | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5->value, true);
+                                                        if(forCount > 0)
+                                                            forQueue.push("POP " + (string)$3);
+                                                        else
+                                                            cout << "POP " << $3 << endl;
+                                                        }
         ;
 
 
 assignment:
-        VARIABLE '=' assignmentValue                   { symTable->setValue($1, $3); cout << "MOV" << $1; }
+        VARIABLE '=' assignmentValue                   { symTable->setValue($1, $3);
+                                                          if(forCount > 0)
+                                                            forQueue.push("POP " + (string)$1);
+                                                          else
+                                                              cout << "POP " << $1 << endl;
+                                                        }
         ;
 
 assignmentValue:
         expression                                
         | CHAR
         | CHARARRAY
-        | VARIABLE '(' parameters ')' {} /*TODO: call function to get return type from symbol table and push it to stack in val struct*/
+        | VARIABLE '(' parameters ')' {cout << "CALL " << $1 << endl;} /*TODO: call function to get return type from symbol table and push it to stack in val struct*/
         ;
 
 initialization:
@@ -74,19 +93,23 @@ initialization:
 
 statement:
         initialization 
-        | WHILE '(' expression ')' scope 
-        | REPEAT scope UNTIL '(' expression ')' 
-        | FOR '(' initialization ';' expression ';' assignment ')' scope    
+        | whileLoop '(' expression endBracketJump scope                       { cout << "JMP Label" << endl << "OutLabel: " << endl; }
+        | repeatLoop scope UNTIL '(' expression ')'                           { cout << "JZ Label" << endl; }
+        | forLoop expression semicolonJump assignment endForDeclaration scope {
+                                                                                while (!forQueue.empty()){
+                                                                                    cout << forQueue.front() << endl; forQueue.pop(); }
+                                                                                cout << "JMP Label" << endl << "OutLabel: " << endl;
+                                                                               }
         | SWITCH '(' expression ')' '{' case '}' /* check switch(exp) can be literal */ 
         | scope
-        | IF '(' expression ')' THEN scope
-        | IF '(' expression ')' THEN scope ELSE scope
+        | IF '(' expression endBracketJump THEN scope { cout << "OutLabel" << endl; }
+        | IF '(' expression endBracketJump THEN scope elseLabel scope
         | funcDeclaration scope  {
                                     if(!funcStack.top().first) { throwError("function declaration without return\n"); }
                                     funcStack.pop();
 
                                  }
-        | VARIABLE '(' parameters ')' { /*printf("function call\n"); */}
+        | VARIABLE '(' parameters ')' { cout << "CALL " << $1 << endl; }
         | RETURN assignmentValue {
                                     if(funcStack.empty()) { throwError("return statement outside function\n"); }
                                     else if(funcStack.top().second != $2->type) {throwError("return type mismatch\n");}
@@ -97,6 +120,34 @@ statement:
                                     if(funcStack.empty()) { throwError("return statement outside function\n"); }
                                     else if(funcStack.top().second != Type::TYPE_VOID) { throwError("return type mismatch\n");}
                                  }
+        ;
+
+whileLoop:
+        WHILE { cout << "Label: " << endl; }
+        ;
+
+repeatLoop:
+        REPEAT { cout << "Label: " << endl; }
+        ;
+
+forLoop:
+        FOR '(' initialization ';' { cout << "Label: " << endl; }
+        ;
+
+endBracketJump:
+        ')' { cout << "JNZ OutLabel" << endl; }
+        ;
+
+semicolonJump:
+        ';' { cout << "JNZ OutLabel" << endl; forCount++; }
+        ;
+
+endForDeclaration:
+        ')' { forCount--; }
+        ;
+
+elseLabel:
+        ELSE { cout << "OutLabel: " << endl; }
         ;
 
 funcDeclaration:
@@ -156,24 +207,39 @@ caseExpression:
 
 expression:
         FLOATING
-        | INTEGER                       {cout << "PUSH" << *(int*)$1->value << endl; $$ = $1;}
-        | BOOLEAN
-        | VARIABLE                     { $$ = new Value{symTable->getValue($1), symTable->getType($1)}; printf("test: %s", $1);}
-        | expression '<' expression
-        | expression '>' expression     
-        | expression LE expression     
-        | expression GE expression      
-        | expression EQ expression
-        | expression NE expression      
-        | expression '|' expression     { cout << "add" << endl; $$ = $1;}
-        | expression '&' expression    { implementOperation($1, $3, OP::AND); $1->isTemp = true; $$ = $1;}
-        | expression '*' expression    { implementOperation($1, $3, OP::MULTIPLY); $1->isTemp = true; $$ = $1;}
-        | expression '/' expression     { cout << "div" << endl ; $$ = $1;}
-        | expression '+' expression    { cout << "add" << endl; $$ = $1;}
-        | expression '-' expression    { implementOperation($1, $3, OP::MINUS); $1->isTemp = true; $$ = $1;}
-        | '~' expression             {$$ = $2;}         
-        | '-' expression             {$$ = $2;}   
-        | '(' expression ')'         {$$ = $2;}   
+        | INTEGER                       { $$ = $1;
+                                            if(forCount > 0)
+                                                forQueue.push("PUSH " + std::to_string(*(int*)$1->value));
+                                            else
+                                                cout << "PUSH " << *(int*)$1->value << endl;
+                                        }
+        | BOOLEAN                       { $$ = $1;
+                                            if(forCount > 0)
+                                                forQueue.push("PUSH " + std::to_string(*(bool*)$1->value));
+                                            else
+                                                cout << "PUSH " << *(int*)$1->value << endl ;
+                                        }
+        | VARIABLE                      { $$ = new Value{symTable->getValue($1), symTable->getType($1)};
+                                            if(forCount > 0)
+                                                forQueue.push("PUSH " + (string)$1);
+                                            else
+                                                cout << "PUSH " << $1 << endl;
+                                        }
+        | expression '<' expression     { implementOperation(OP::LeT, forCount,&forQueue);  $$ = $1; /* TODO: check on type and propagate*/}
+        | expression '>' expression     { implementOperation(OP::GrT, forCount,&forQueue); $$ = $1;}
+        | expression LE expression      { implementOperation(OP::LeE, forCount,&forQueue); $$ = $1;}
+        | expression GE expression      { implementOperation(OP::GrE, forCount,&forQueue); $$ = $1;}
+        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forQueue); $$ = $1;}
+        | expression NE expression      { implementOperation(OP::NoE, forCount,&forQueue); $$ = $1;}
+        | expression '|' expression     { implementOperation(OP::OR, forCount,&forQueue); $$ = $1;}
+        | expression '&' expression     { implementOperation(OP::AND, forCount,&forQueue); $$ = $1;}
+        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forQueue); $$ = $1;}
+        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forQueue); $$ = $1;}
+        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forQueue); $$ = $1;}
+        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forQueue); $$ = $1;}
+        | '~' expression                { implementOperation(OP::NOT, forCount,&forQueue); $$ = $2;}
+        | '-' expression                { implementOperation(OP::NEG, forCount,&forQueue); $$ = $2;}
+        | '(' expression ')'            { $$ = $2;}
         ;
 datatype:
         INT                             { $$ = Type::TYPE_INT; }
@@ -188,7 +254,7 @@ scope:
         ;
 
 scopeInit:
-        '{'       {symTable = new SymbolTable(symTable); printf("scope\n");}
+        '{'       {symTable = new SymbolTable(symTable);}
         ;
 
 /* funcScopeValue:

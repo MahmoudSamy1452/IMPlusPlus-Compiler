@@ -24,5 +24,6 @@ enum OP
     LeE,
     GrE,
     EQQ,
-    NoE
+    NoE,
+    NEG
 };

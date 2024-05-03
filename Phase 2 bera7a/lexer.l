@@ -68,7 +68,6 @@
 
 [a-zA-Z_][a-zA-Z0-9_]*  {
                           yylval.string = strdup(yytext);
-                          printf("Variable %s\n", yylval.string);
                           return VARIABLE;
                         }
 

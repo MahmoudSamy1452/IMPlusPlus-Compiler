@@ -7,9 +7,9 @@ SymbolTable::SymbolTable(SymbolTable *parent) {
 
 void SymbolTable::insert(string name, Type type, void *value, bool isConst, vector <pair<Type, string>> *args,
                          Type *returnType) {
-    cout << "Inserting " << name << " of type " << type << " in symbol table\n";
-    if (value != nullptr)
-        cout << "Value: " << *(int *) value << "\n";
+//    cout << "Inserting " << name << " of type " << type << " in symbol table\n";
+//    if (value != nullptr)
+//        cout << "Value: " << *(int *) value << "\n";
     if (this->table.find(name) != this->table.end())
         throw invalid_argument("Variable already defined in this scope");
     
@@ -54,11 +54,11 @@ Type SymbolTable::getType(string name) {
 
 void SymbolTable::setValue(string name, Value *val) {
     // print the unordered map
-    cout << name << endl;
-    for (auto it = this->table.begin(); it != this->table.end(); ++it) {
-        cout << it->first << " " << it->second->type << " " << *(int *) (it->second->value) << " "
-             << it->second->isConst << endl;
-    }
+//    cout << name << endl;
+//    for (auto it = this->table.begin(); it != this->table.end(); ++it) {
+//        cout << it->first << " " << it->second->type << " " << *(int *) (it->second->value) << " "
+//             << it->second->isConst << endl;
+//    }
     auto entry = lookup(name);
     if (entry->isConst) {
         throw invalid_argument("Cannot assign to const variable");
