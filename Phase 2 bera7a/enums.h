@@ -9,3 +9,20 @@ enum Type
     TYPE_VOID,
     TYPE_FUNC
 };
+
+enum OP
+{
+    PLUS,
+    MINUS,
+    MULTIPLY,
+    DIVIDE,
+    AND,
+    OR,
+    NOT,
+    LeT,
+    GrT,
+    LeE,
+    GrE,
+    EQQ,
+    NoE
+};

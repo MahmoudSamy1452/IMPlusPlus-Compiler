@@ -8,7 +8,8 @@ SymbolTable::SymbolTable(SymbolTable *parent) {
 void SymbolTable::insert(string name, Type type, void *value, bool isConst, vector <pair<Type, string>> *args,
                          Type *returnType) {
     cout << "Inserting " << name << " of type " << type << " in symbol table\n";
-    cout << "Value: " << *(int *) value << "\n";
+    if (value != nullptr)
+        cout << "Value: " << *(int *) value << "\n";
     if (this->table.find(name) != this->table.end())
         throw invalid_argument("Variable already defined in this scope");
     
@@ -41,6 +42,8 @@ SymbolTableEntry *SymbolTable::lookup(string name) {
 
 void *SymbolTable::getValue(string name) {
     SymbolTableEntry *table = this->lookup(name);
+    if (table->value == nullptr)
+        throw invalid_argument("Variable was not initialized");
     return table->value;
 }
 

@@ -49,7 +49,7 @@ program:
 
 declaration:
         datatype VARIABLE                               { symTable->insert($2, $1); printf("declaration\n");}
-        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value); printf("declaration = value\n");}
+        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value); printf("%f", *(double*)($4->value));}
         | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5->value, true); printf("const declaration");}
         ;
 
@@ -77,8 +77,8 @@ statement:
         | FOR '(' initialization ';' expression ';' assignment ')' scope    
         | SWITCH '(' expression ')' '{' case '}' /* check switch(exp) can be literal */ 
         | scope
-        | IF '(' expression ')' THEN scope 
-        | IF '(' expression ')' THEN scope ELSE scope 
+        | IF '(' expression ')' THEN scope
+        | IF '(' expression ')' THEN scope ELSE scope
         | funcDeclaration scope  {
                                     if(!funcStack.top().first) { throwError("function declaration without return\n"); }
                                     funcStack.pop();
@@ -155,13 +155,13 @@ caseExpression:
 expression:
         FLOATING
         | INTEGER
-        | BOOLEAN                       
-        | VARIABLE                     { $$ = new Value{symTable->getValue($1), symTable->getType($1)}; }
-        | expression '<' expression     
+        | BOOLEAN
+        | VARIABLE                     { $$ = new Value{symTable->getValue($1), symTable->getType($1)}; printf("test: %s", $1);}
+        | expression '<' expression
         | expression '>' expression     
         | expression LE expression     
         | expression GE expression      
-        | expression EQ expression      
+        | expression EQ expression
         | expression NE expression      
         | expression '|' expression     
         | expression '&' expression    
