@@ -3,7 +3,7 @@
   #include "y.tab.h"
   #include "structs.h"
   #include "enums.h"
-  void yyerror(char*);
+  void yyerror(const char*);
   int count = 1;
 %}
 %%

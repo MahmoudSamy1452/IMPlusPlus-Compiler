@@ -1,17 +1,21 @@
 %code requires{
     #include "SymbolTable.h"
     #include "structs.h"
+    #include <stack>
+    #include <utility>
 }
 
 %{
     #include <stdio.h>
     #include "structs.h"
     #include "SymbolTable.h"
-    void yyerror(char *);
+    void yyerror(const char *);
+    void throwError(string);
     int yylex(void);
     extern FILE *yyin;
 
     SymbolTable* symTable = new SymbolTable();
+    std::stack <std::pair<bool, Type>> funcStack;
 %}
 
 %union {
@@ -45,7 +49,7 @@ program:
 
 declaration:
         datatype VARIABLE                               { symTable->insert($2, $1); printf("declaration\n");}
-        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4); printf("declaration = value\n");}
+        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value); printf("declaration = value\n");}
         | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5->value, true); printf("const declaration");}
         ;
 
@@ -75,11 +79,27 @@ statement:
         | scope
         | IF '(' expression ')' THEN scope 
         | IF '(' expression ')' THEN scope ELSE scope 
-        | FUNCTION datatype VARIABLE '(' arguments ')' scope 
-        | FUNCTION VOID VARIABLE '(' arguments ')' scope { /*printf("function\n");*/}
+        | funcDeclaration scope  {
+                                    if(!funcStack.top().first) { throwError("function declaration without return\n"); }
+                                    funcStack.pop();
+
+                                 }
         | VARIABLE '(' parameters ')' { /*printf("function call\n"); */}
-        | RETURN assignmentValue
-        | RETURN
+        | RETURN assignmentValue {
+                                    if(funcStack.empty()) { throwError("return statement outside function\n"); }
+                                    else if(funcStack.top().second != $2->type) {throwError("return type mismatch\n");}
+                                    funcStack.pop();
+                                    funcStack.push(std::make_pair(true, $2->type));
+                                 }
+        | RETURN                {
+                                    if(funcStack.empty()) { throwError("return statement outside function\n"); }
+                                    else if(funcStack.top().second != Type::TYPE_VOID) { throwError("return type mismatch\n");}
+                                 }
+        ;
+
+funcDeclaration:
+        FUNCTION datatype VARIABLE '(' arguments ')' { funcStack.push(std::make_pair(false, $2)); printf("function declaration\n");}
+        | FUNCTION VOID VARIABLE '(' arguments ')'  { funcStack.push(std::make_pair(true, Type::TYPE_VOID)); printf("function declaration\n");}
         ;
 
 argumentsList:
@@ -164,7 +184,11 @@ datatype:
         ;
 
 scope:
-        '{' program '}' 
+        scopeInit program '}' {symTable = symTable->getParentTable();}
+        ;
+
+scopeInit:
+        '{'       {symTable = new SymbolTable(symTable); printf("scope\n");}
         ;
 
 /* funcScopeValue:
@@ -186,8 +210,14 @@ funcScopeVoid:
 
 %%
 
-void yyerror(char *s) {
+void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
+    exit(1);
+}
+
+void throwError(string s) {
+    const char *x = s.c_str();
+    yyerror(x);
 }
 
 int main(int argc, char *argv[]) {

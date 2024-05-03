@@ -35,4 +35,6 @@ public:
   Type getType(string name);
 
   void setValue(string name, Value *val);
+  
+  SymbolTable* getParentTable();
 };
