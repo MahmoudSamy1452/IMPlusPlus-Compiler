@@ -7,11 +7,14 @@ SymbolTable::SymbolTable(SymbolTable *parent) {
 
 void SymbolTable::insert(string name, Type type, void *value, bool isConst, vector <pair<Type, string>> *args,
                          Type *returnType) {
-//    cout << "Inserting " << name << " of type " << type << " in symbol table\n";
-//    if (value != nullptr)
-//        cout << "Value: " << *(int *) value << "\n";
-    if (this->table.find(name) != this->table.end())
+    
+    // for(auto it = this->table.begin(); it != this->table.end(); ++it) {
+    //     cout << it->first << " " << it->second->type << " " << it->second->isConst << endl;
+    // }
+    // cout << "YA MALLEEEEKEKEKEKEKKEK" << endl;
+    if (this->table.find(name) != this->table.end()){
         throw invalid_argument("Variable already defined in this scope");
+    }
     
     if (!(type >= Type::TYPE_INT && type <= Type::TYPE_FUNC))
         throw invalid_argument("Invalid type");

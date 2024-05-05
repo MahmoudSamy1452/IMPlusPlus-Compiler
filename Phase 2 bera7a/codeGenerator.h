@@ -2,7 +2,7 @@
 #include "enums.h"
 #include "structs.h"
 #include <iostream>
-#include <queue>
+#include <stack>
 using namespace std;
 
 void printValue(Value *val)
@@ -29,52 +29,52 @@ void printValue(Value *val)
     }
 }
 
-void implementOperation(OP op, int forCount, queue<string>* forQueue)
+void implementOperation(OP op, int forCount, stack<string>* forStack)
 {
     if (forCount > 0){
         switch (op)
         {
             case OP::PLUS:
-                forQueue->push("ADD");
+                forStack->push("ADD");
                 break;
             case OP::MINUS:
-                forQueue->push("SUB");
+                forStack->push("SUB");
                 break;
             case OP::MULTIPLY:
-                forQueue->push("MUL");
+                forStack->push("MUL");
                 break;
             case OP::DIVIDE:
-                forQueue->push("DIV");
+                forStack->push("DIV");
                 break;
             case OP::AND:
-                forQueue->push("AND");
+                forStack->push("AND");
                 break;
             case OP::OR:
-                forQueue->push("OR");
+                forStack->push("OR");
                 break;
             case OP::NOT:
-                forQueue->push("NOT");
+                forStack->push("NOT");
                 break;
             case OP::LeT:
-                forQueue->push("LT");
+                forStack->push("LT");
                 break;
             case OP::GrT:
-                forQueue->push("GT");
+                forStack->push("GT");
                 break;
             case OP::LeE:
-                forQueue->push("LE");
+                forStack->push("LE");
                 break;
             case OP::GrE:
-                forQueue->push("GE");
+                forStack->push("GE");
                 break;
             case OP::EQQ:
-                forQueue->push("EQ");
+                forStack->push("EQ");
                 break;
             case OP::NoE:
-                forQueue->push("NE");
+                forStack->push("NE");
                 break;
             case OP::NEG:
-                forQueue->push("NEG");
+                forStack->push("NEG");
                 break;
             default:
                 break;

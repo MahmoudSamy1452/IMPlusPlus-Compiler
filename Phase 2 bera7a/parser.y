@@ -5,7 +5,6 @@
     #include <utility>
     #include <queue>
     #include <string>
-    
 }
 
 %{
@@ -20,8 +19,9 @@
 
     SymbolTable* symTable = new SymbolTable();
     std::stack<std::pair<bool, Type>> funcStack;
-    int forCount = 0;
-    std::queue<string> forQueue;
+    std::stack<int> labelsStack;
+    int forCount = 0, labels = 0;
+    std::stack<string> forStack;
 %}
 
 %union {
@@ -54,26 +54,30 @@ program:
         ;
 
 declaration:
-        datatype VARIABLE                               { symTable->insert($2, $1); }
-        | datatype VARIABLE '=' assignmentValue         { symTable->insert($2, $1, $4->value);
-                                                          if(forCount > 0)
-                                                            forQueue.push("POP " + (string)$2);
-                                                          else
-                                                              cout << "POP " << $2 << endl;
+        datatype VARIABLE                               {       
+                                                                symTable->insert($2, $1);
                                                         }
-        | CONST datatype VARIABLE '=' assignmentValue   { symTable->insert($3, $2, $5->value, true);
-                                                        if(forCount > 0)
-                                                            forQueue.push("POP " + (string)$3);
-                                                        else
-                                                            cout << "POP " << $3 << endl;
+        | datatype VARIABLE '=' assignmentValue         { 
+                                                                symTable->insert($2, $1, $4->value);
+                                                                if(forCount > 0)
+                                                                        forStack.push("POP " + (string)$2);
+                                                                else
+                                                                        cout << "POP " << $2 << endl;
+                                                        }
+        | CONST datatype VARIABLE '=' assignmentValue   {       symTable->insert($3, $2, $5->value, true);
+                                                                if(forCount > 0)
+                                                                        forStack.push("POP " + (string)$3);
+                                                                else
+                                                                        cout << "POP " << $3 << endl;
                                                         }
         ;
 
 
 assignment:
         VARIABLE '=' assignmentValue                   { symTable->setValue($1, $3);
-                                                          if(forCount > 0)
-                                                            forQueue.push("POP " + (string)$1);
+                                                          if(forCount > 0){
+                                                                forStack.push("POP " + (string)$1);
+                                                          }
                                                           else
                                                               cout << "POP " << $1 << endl;
                                                         }
@@ -93,17 +97,32 @@ initialization:
 
 statement:
         initialization 
-        | whileLoop '(' expression endBracketJump scope                       { cout << "JMP Label" << endl << "OutLabel: " << endl; }
-        | repeatLoop scope UNTIL '(' expression ')'                           { cout << "JZ Label" << endl; }
+        | whileLoop '(' expression endBracketJump scope                       { 
+                                                                                cout << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                labelsStack.pop();
+                                                                                }
+        | repeatLoop scope UNTIL '(' expression ')'                           { 
+                                                                                cout << "JZ Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                labelsStack.pop();
+                                                                                }
         | forLoop expression semicolonJump assignment endForDeclaration scope {
-                                                                                while (!forQueue.empty()){
-                                                                                    cout << forQueue.front() << endl; forQueue.pop(); }
-                                                                                cout << "JMP Label" << endl << "OutLabel: " << endl;
+                                                                                stack<string> tempStack;
+                                                                                while (forStack.top() != "@"){
+                                                                                    tempStack.push(forStack.top());
+                                                                                    forStack.pop();
+                                                                                }
+                                                                                forStack.pop();
+                                                                                while (!tempStack.empty()){
+                                                                                    cout << tempStack.top() << endl;
+                                                                                    tempStack.pop();
+                                                                                }
+                                                                                cout << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                labelsStack.pop();
                                                                                }
         | SWITCH '(' expression ')' '{' case '}' /* check switch(exp) can be literal */ 
         | scope
-        | IF '(' expression endBracketJump THEN scope { cout << "OutLabel" << endl; }
-        | IF '(' expression endBracketJump THEN scope elseLabel scope
+        | ifCondition '(' expression endBracketJump THEN scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
+        | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
         | funcDeclaration scope  {
                                     if(!funcStack.top().first) { throwError("function declaration without return\n"); }
                                     funcStack.pop();
@@ -123,23 +142,38 @@ statement:
         ;
 
 whileLoop:
-        WHILE { cout << "Label: " << endl; }
+        WHILE                   { 
+                                        cout << endl << "Label" << labels << ": " << endl;
+                                        labelsStack.push(labels++);
+                                }
         ;
 
 repeatLoop:
-        REPEAT { cout << "Label: " << endl; }
+        REPEAT                  { 
+                                        cout << endl << "Label" << labels << ": " << endl;
+                                        labelsStack.push(labels++);
+                                }
         ;
 
 forLoop:
-        FOR '(' initialization ';' { cout << "Label: " << endl; }
+        FOR '(' initialization ';'      { 
+                                                cout << endl << "Label" << labels << ": " << endl;
+                                                labelsStack.push(labels++);
+                                        }
+        ;
+
+ifCondition: 
+        IF                              { 
+                                                labelsStack.push(labels++); 
+                                        }
         ;
 
 endBracketJump:
-        ')' { cout << "JNZ OutLabel" << endl; }
+        ')' { cout << "JZ OutLabel" << labelsStack.top() << endl; }
         ;
 
 semicolonJump:
-        ';' { cout << "JNZ OutLabel" << endl; forCount++; }
+        ';' { cout << "JZ OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
         ;
 
 endForDeclaration:
@@ -147,7 +181,7 @@ endForDeclaration:
         ;
 
 elseLabel:
-        ELSE { cout << "OutLabel: " << endl; }
+        ELSE { cout << "JMP OutLabel" << labels << '\n' << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); labelsStack.push(labels++); }
         ;
 
 funcDeclaration:
@@ -209,36 +243,36 @@ expression:
         FLOATING
         | INTEGER                       { $$ = $1;
                                             if(forCount > 0)
-                                                forQueue.push("PUSH " + std::to_string(*(int*)$1->value));
+                                                forStack.push("PUSH " + std::to_string(*(int*)$1->value));
                                             else
                                                 cout << "PUSH " << *(int*)$1->value << endl;
                                         }
         | BOOLEAN                       { $$ = $1;
                                             if(forCount > 0)
-                                                forQueue.push("PUSH " + std::to_string(*(bool*)$1->value));
+                                                forStack.push("PUSH " + std::to_string(*(bool*)$1->value));
                                             else
                                                 cout << "PUSH " << *(int*)$1->value << endl ;
                                         }
         | VARIABLE                      { $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                             if(forCount > 0)
-                                                forQueue.push("PUSH " + (string)$1);
+                                                forStack.push("PUSH " + (string)$1);
                                             else
                                                 cout << "PUSH " << $1 << endl;
                                         }
-        | expression '<' expression     { implementOperation(OP::LeT, forCount,&forQueue);  $$ = $1; /* TODO: check on type and propagate*/}
-        | expression '>' expression     { implementOperation(OP::GrT, forCount,&forQueue); $$ = $1;}
-        | expression LE expression      { implementOperation(OP::LeE, forCount,&forQueue); $$ = $1;}
-        | expression GE expression      { implementOperation(OP::GrE, forCount,&forQueue); $$ = $1;}
-        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forQueue); $$ = $1;}
-        | expression NE expression      { implementOperation(OP::NoE, forCount,&forQueue); $$ = $1;}
-        | expression '|' expression     { implementOperation(OP::OR, forCount,&forQueue); $$ = $1;}
-        | expression '&' expression     { implementOperation(OP::AND, forCount,&forQueue); $$ = $1;}
-        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forQueue); $$ = $1;}
-        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forQueue); $$ = $1;}
-        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forQueue); $$ = $1;}
-        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forQueue); $$ = $1;}
-        | '~' expression                { implementOperation(OP::NOT, forCount,&forQueue); $$ = $2;}
-        | '-' expression                { implementOperation(OP::NEG, forCount,&forQueue); $$ = $2;}
+        | expression '<' expression     { implementOperation(OP::LeT, forCount,&forStack);  $$ = $1; /* TODO: check on type and propagate*/}
+        | expression '>' expression     { implementOperation(OP::GrT, forCount,&forStack); $$ = $1;}
+        | expression LE expression      { implementOperation(OP::LeE, forCount,&forStack); $$ = $1;}
+        | expression GE expression      { implementOperation(OP::GrE, forCount,&forStack); $$ = $1;}
+        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forStack); $$ = $1;}
+        | expression NE expression      { implementOperation(OP::NoE, forCount,&forStack); $$ = $1;}
+        | expression '|' expression     { implementOperation(OP::OR, forCount,&forStack); $$ = $1;}
+        | expression '&' expression     { implementOperation(OP::AND, forCount,&forStack); $$ = $1;}
+        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forStack); $$ = $1;}
+        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forStack); $$ = $1;}
+        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forStack); $$ = $1;}
+        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forStack); $$ = $1;}
+        | '~' expression                { implementOperation(OP::NOT, forCount,&forStack); $$ = $2;}
+        | '-' expression                { implementOperation(OP::NEG, forCount,&forStack); $$ = $2;}
         | '(' expression ')'            { $$ = $2;}
         ;
 datatype:

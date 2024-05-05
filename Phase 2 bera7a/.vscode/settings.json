@@ -10,6 +10,9 @@
     "scoped_allocator": "cpp",
     "tuple": "cpp",
     "type_traits": "cpp",
-    "utility": "cpp"
+    "utility": "cpp",
+    "random": "c",
+    "valarray": "c",
+    "charconv": "c"
   }
 }

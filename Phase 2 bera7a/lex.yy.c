@@ -845,31 +845,30 @@ YY_RULE_SETUP
 #line 69 "lexer.l"
 {
                           yylval.string = strdup(yytext);
-                          printf("Variable %s\n", yylval.string);
                           return VARIABLE;
                         }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 75 "lexer.l"
+#line 74 "lexer.l"
 ;       /* ignore whitespace */
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 76 "lexer.l"
+#line 75 "lexer.l"
 ;       /* ignore comments */
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 78 "lexer.l"
+#line 77 "lexer.l"
 ; yyerror("Unknown character");
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 79 "lexer.l"
+#line 78 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 873 "lex.yy.c"
+#line 872 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1755,7 +1754,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 79 "lexer.l"
+#line 78 "lexer.l"
 
 int yywrap(void) {
     return 1;
