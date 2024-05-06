@@ -22,6 +22,7 @@
     std::stack<int> labelsStack;
     int forCount = 0, labels = 0;
     std::stack<string> forStack;
+    std::stack<int> switchStack;
 %}
 
 %union {
@@ -59,6 +60,7 @@ declaration:
                                                         }
         | datatype VARIABLE '=' assignmentValue         { 
                                                                 symTable->insert($2, $1, $4->value);
+                                                                symTable->setValue($2, $4);
                                                                 if(forCount > 0)
                                                                         forStack.push("POP " + (string)$2);
                                                                 else
@@ -119,7 +121,7 @@ statement:
                                                                                 cout << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                }
-        | SWITCH '(' expression ')' '{' case '}' /* check switch(exp) can be literal */ 
+        | SWITCH '(' caseExpression endCaseExpression '{' case '}'              { cout << "OutLabel" << switchStack.top() << ":" << endl;                                                                       switchStack.pop(); labelsStack.pop(); }
         | scope
         | ifCondition '(' expression endBracketJump THEN scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
         | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
@@ -172,6 +174,11 @@ endBracketJump:
         ')' { cout << "JZ OutLabel" << labelsStack.top() << endl; }
         ;
 
+endCaseExpression:
+        ')' { cout << "POP $t" << labels << endl; labelsStack.push(labels++); switchStack.push(labels++);
+                cout << "Stack top in endCaseExpression: " << labelsStack.top() << endl; }
+        ;
+
 semicolonJump:
         ';' { cout << "JZ OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
         ;
@@ -210,33 +217,75 @@ parameters:
         ;
 
 case:
-        CASE caseCondition ':' scope 
-        | CASE caseCondition ':' scope case 
+        CASE caseExpression caseColon caseScope                 { 
+                                                                        // cout << "JMP OutLabel" << switchStack.top() << endl << "label" << labelsStack.top() << ":" << endl;
+                                                                        // labelsStack.pop();
+                                                                        cout << "Stack top in case: " << labelsStack.top() << endl;
+                                                                }
+        | CASE caseExpression caseColon caseScope case          { 
+                                                                        // cout << "JMP OutLabel" << switchStack.top() << endl << "label" << labelsStack.top() << ":" << endl;
+                                                                        // labelsStack.pop();
+                                                                        cout << "Stack top in case case: " << labelsStack.top() << endl;
+                                                                }
         ;
 
-caseCondition:
+/* caseCondition:
         | CHAR
         | caseExpression
-        ;
+        ; */
 
 caseExpression:
-        INTEGER
-        | BOOLEAN                       
-        | caseExpression '<' caseExpression     
-        | caseExpression '>' caseExpression     
-        | caseExpression LE caseExpression      
-        | caseExpression GE caseExpression      
-        | caseExpression EQ caseExpression      
-        | caseExpression NE caseExpression      
-        | caseExpression '|' caseExpression     
-        | caseExpression '&' caseExpression     
-        | caseExpression '+' caseExpression     
-        | caseExpression '-' caseExpression     
-        | caseExpression '*' caseExpression     
-        | caseExpression '/' caseExpression     
-        | '~' caseExpression {$$ = $2;}               
-        | '-' caseExpression {$$ = $2;} 
-        | '(' caseExpression ')' {$$ = $2;}       
+        INTEGER                         {  
+                                                $$ = $1;
+                                                cout << "PUSH " << *(int*)$1->value << endl;
+                                        }
+        | BOOLEAN                       { 
+                                                $$ = $1;
+                                                cout << "PUSH " << *(bool*)$1->value << endl ;
+                                        }
+        | CHAR                          { 
+                                                $$ = $1;
+                                                cout << "PUSH " << *(char*)$1->value << endl;
+                                        }
+        | VARIABLE                      { 
+                                                Type t = symTable->getType($1);
+                                                if(t == Type::TYPE_INT || t == Type::TYPE_BOOL || t == Type::TYPE_CHAR)
+                                                    $$ = new Value{symTable->getValue($1), symTable->getType($1)};
+                                                else
+                                                        throwError("invalid case expression\n");
+                                                cout << "PUSH " << $1 << endl;
+                                        }
+        | caseExpression '<' caseExpression     { implementOperation(OP::LeT, forCount,&forStack);  $$ = $1;}
+        | caseExpression '>' caseExpression     { implementOperation(OP::GrT, forCount,&forStack); $$ = $1;}
+        | caseExpression LE caseExpression      { implementOperation(OP::LeE, forCount,&forStack); $$ = $1;}
+        | caseExpression GE caseExpression      { implementOperation(OP::GrE, forCount,&forStack); $$ = $1;}
+        | caseExpression EQ caseExpression      { implementOperation(OP::EQQ, forCount,&forStack); $$ = $1;}
+        | caseExpression NE caseExpression      { implementOperation(OP::NoE, forCount,&forStack); $$ = $1;}
+        | caseExpression '|' caseExpression     { implementOperation(OP::OR, forCount,&forStack); $$ = $1;}
+        | caseExpression '&' caseExpression     { implementOperation(OP::AND, forCount,&forStack); $$ = $1;}
+        | caseExpression '+' caseExpression     { implementOperation(OP::PLUS, forCount,&forStack); $$ = $1;}
+        | caseExpression '-' caseExpression     { implementOperation(OP::MINUS, forCount,&forStack); $$ = $1;}
+        | caseExpression '*' caseExpression     { implementOperation(OP::MULTIPLY, forCount,&forStack); $$ = $1;}
+        | caseExpression '/' caseExpression     { implementOperation(OP::DIVIDE, forCount,&forStack); $$ = $1;}
+        | '~' caseExpression                { implementOperation(OP::NOT, forCount,&forStack); $$ = $2;}
+        | '-' caseExpression                { implementOperation(OP::NEG, forCount,&forStack); $$ = $2;}
+        | '(' caseExpression ')'            { $$ = $2;}    
+        ;
+
+caseColon:
+        ':'                     {   
+                                        cout << "PUSH $t" << labelsStack.top() << endl << "EQ" << endl << "JZ label" << labels << endl; 
+                                        labelsStack.push(labels++); 
+                                        cout << "Stack top in caseColon: " << labelsStack.top() << endl;
+                                }
+        ;
+
+caseScope:
+        scope                   { 
+                                        cout << "JMP OutLabel" << switchStack.top() << endl << "label " << labelsStack.top() << ":" << endl;
+                                        labelsStack.pop();
+                                        cout << "Stack top in caseScope: " << labelsStack.top() << endl;
+                                }
         ;
 
 expression:
@@ -253,11 +302,20 @@ expression:
                                             else
                                                 cout << "PUSH " << *(int*)$1->value << endl ;
                                         }
-        | VARIABLE                      { $$ = new Value{symTable->getValue($1), symTable->getType($1)};
-                                            if(forCount > 0)
-                                                forStack.push("PUSH " + (string)$1);
-                                            else
-                                                cout << "PUSH " << $1 << endl;
+        | VARIABLE                      { 
+                                                if(forCount > 0)
+                                                        forStack.push("PUSH " + (string)$1);
+                                                else
+                                                        cout << "PUSH " << $1 << endl;
+                                                Type t = symTable->getType($1)
+                                                if(t == Type::TYPE_INT || t == Type::TYPE_BOOL || t == Type::TYPE_FLOAT)
+                                                {
+                                                $$ = new Value{symTable->getValue($1), symTable->getType($1)};
+                                                }
+                                                else
+                                                {
+                                                throwError("invalid case expression\n"
+                                                }
                                         }
         | expression '<' expression     { implementOperation(OP::LeT, forCount,&forStack);  $$ = $1; /* TODO: check on type and propagate*/}
         | expression '>' expression     { implementOperation(OP::GrT, forCount,&forStack); $$ = $1;}

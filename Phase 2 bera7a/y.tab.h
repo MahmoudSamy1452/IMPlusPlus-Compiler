@@ -123,7 +123,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 27 "parser.y"
+#line 28 "parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
