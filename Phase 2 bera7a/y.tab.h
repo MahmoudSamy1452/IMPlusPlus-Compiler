@@ -35,7 +35,7 @@
 /* "%code requires" blocks.  */
 
 /* Line 1676 of yacc.c  */
-#line 1 "parser.y"
+#line 1 ".\\parser.y"
 
     #include "SymbolTable.h"
     #include "structs.h"
@@ -43,11 +43,12 @@
     #include <utility>
     #include <queue>
     #include <string>
+    #include <fstream>
 
 
 
 /* Line 1676 of yacc.c  */
-#line 51 "y.tab.h"
+#line 52 "y.tab.h"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -123,17 +124,18 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 28 "parser.y"
+#line 35 ".\\parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
     Type type;
     Value* val;
+    queue<Type>* types;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 137 "y.tab.h"
+#line 139 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

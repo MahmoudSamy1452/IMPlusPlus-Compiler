@@ -6,6 +6,8 @@
   void yyerror(const char*);
   int count = 1;
 %}
+
+%option yylineno
 %%
 
 ([1-9][0-9]*|0)         {

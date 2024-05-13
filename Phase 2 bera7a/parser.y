@@ -5,6 +5,7 @@
     #include <utility>
     #include <queue>
     #include <string>
+    #include <fstream>
 }
 
 %{
@@ -18,11 +19,17 @@
     extern FILE *yyin;
 
     SymbolTable* symTable = new SymbolTable();
-    std::stack<std::pair<bool, Type>> funcStack;
     std::stack<int> labelsStack;
     int forCount = 0, labels = 0;
     std::stack<string> forStack;
     std::stack<int> switchStack;
+
+    string* currentFunction = nullptr;
+
+    extern int yylineno;
+
+    ofstream quadFile("Quadruples.txt");
+
 %}
 
 %union {
@@ -30,6 +37,7 @@
     char* string;               /* string value */
     Type type;
     Value* val;
+    queue<Type>* types;
 };
 
 %token <val> CHAR CHARARRAY INTEGER FLOATING BOOLEAN
@@ -37,6 +45,7 @@
 %token WHILE REPEAT UNTIL FOR SWITCH CASE IF THEN ELSE FUNCTION RETURN INT FLOAT CHARACTER STRING BOOL VOID CONST GE LE EQ NE
 %type <type> datatype
 %type <val> assignmentValue expression caseExpression
+%type <types> parametersList parameters
 
 %nonassoc '='
 %left '|'
@@ -49,9 +58,9 @@
 %%
 
 program:
-        statement ';' program
-        | /* NULL */
-        | ';' program
+        statement ';' program {symTable->checkUnusedVariables();}
+        | /* NULL */    {symTable->checkUnusedVariables();}
+        | ';' program {symTable->checkUnusedVariables();}
         ;
 
 declaration:
@@ -59,6 +68,7 @@ declaration:
                                                                 symTable->insert($2, $1);
                                                         }
         | datatype VARIABLE '=' assignmentValue         { 
+
                                                                 symTable->insert($2, $1, $4->value);
                                                                 symTable->setValue($2, $4);
                                                                 if(forCount > 0)
@@ -86,10 +96,22 @@ assignment:
         ;
 
 assignmentValue:
-        expression                                
-        | CHAR
-        | CHARARRAY
-        | VARIABLE '(' parameters ')' {cout << "CALL " << $1 << endl;} /*TODO: call function to get return type from symbol table and push it to stack in val struct*/
+        CHAR { cout << "PUSH " << *(char*)$1->value << endl; $$ = $1; }
+        | CHARARRAY { cout << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl; $$ = $1; }
+        | expression
+        | VARIABLE '(' parameters ')' {
+                                        if(symTable->lookup($1) == nullptr) {
+                                            throwError("function " + string($1) + " not declared\n");
+                                        }
+                                        else if(symTable->lookup($1)->type != Type::TYPE_FUNC) {
+                                            throwError(string($1) + " is not a function\n");
+                                        }
+                                        else if(symTable->lookup($1)->args->size() != $3->size()) {
+                                            throwError("function " + string($1) + " argument size mismatch\n");
+                                        }
+                                        cout << "CALL " << $1 << endl; 
+                                        $$ = new Value{nullptr, *symTable->lookup($1)->returnType};
+                                }
         ;
 
 initialization:
@@ -125,21 +147,44 @@ statement:
         | scope
         | ifCondition '(' expression endBracketJump THEN scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
         | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
-        | funcDeclaration scope  {
-                                    if(!funcStack.top().first) { throwError("function declaration without return\n"); }
-                                    funcStack.pop();
-
-                                 }
-        | VARIABLE '(' parameters ')' { cout << "CALL " << $1 << endl; }
+        | funcDeclaration scope 
+        | VARIABLE '(' parameters ')' {
+                                        if(symTable->lookup($1) == nullptr) {
+                                            throwError("function " + string($1) + " not declared\n");
+                                        }
+                                        else if(symTable->lookup($1)->type != Type::TYPE_FUNC) {
+                                            throwError(string($1) + " is not a function\n");
+                                        }
+                                        else if(symTable->lookup($1)->args->size() != $3->size()) {
+                                            throwError("function " + string($1) + " argument size mismatch\n");
+                                        }
+                                        auto params = $3;
+                                        auto args = *symTable->lookup($1)->args;
+                                        for(auto arg: args) {
+                                            if(arg.first != params->front()) {
+                                                throwError("argument type mismatch\n");
+                                            }
+                                            params->pop();
+                                        }
+                                        cout << "CALL " << $1 << endl; 
+                                }
         | RETURN assignmentValue {
-                                    if(funcStack.empty()) { throwError("return statement outside function\n"); }
-                                    else if(funcStack.top().second != $2->type) {throwError("return type mismatch\n");}
-                                    funcStack.pop();
-                                    funcStack.push(std::make_pair(true, $2->type));
+                                    cout << "POP " << "$retvalue" << endl;
+                                    cout << "RET " << "$retvalue" << endl;
+                                //     cout << "function name: " <<symTable->getFunctionName() << endl;
+                                    if(symTable->getFunctionName() == nullptr) {
+                                        throwError("return statement outside function\n");
+                                    }
+                                    else if(*symTable->getReturnType(*symTable->getFunctionName()) != $2->type) {throwError("return type mismatch\n");}
+                                    symTable->setIsReturned();
                                  }
         | RETURN                {
-                                    if(funcStack.empty()) { throwError("return statement outside function\n"); }
-                                    else if(funcStack.top().second != Type::TYPE_VOID) { throwError("return type mismatch\n");}
+                                    cout << "RET" << endl;
+                                    if(symTable->getFunctionName() == nullptr) {
+                                        throwError("return statement outside function\n");
+                                    }
+                                    else if(*symTable->getReturnType(*symTable->getFunctionName()) != Type::TYPE_VOID) {throwError("return type mismatch\n");}
+                                    symTable->setIsReturned();
                                  }
         ;
 
@@ -192,13 +237,17 @@ elseLabel:
         ;
 
 funcDeclaration:
-        FUNCTION datatype VARIABLE '(' arguments ')' { funcStack.push(std::make_pair(false, $2)); printf("function declaration\n");}
-        | FUNCTION VOID VARIABLE '(' arguments ')'  { funcStack.push(std::make_pair(true, Type::TYPE_VOID)); printf("function declaration\n");}
+        funcHeader '(' arguments ')'
+        ;
+
+funcHeader:
+        FUNCTION datatype VARIABLE  { cout << $3 << ':' << endl; symTable->insert($3, Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type($2)); currentFunction = new string($3);}
+        | FUNCTION VOID VARIABLE   { cout << $3 << ':' << endl; symTable->insert($3, Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type(Type::TYPE_VOID)); currentFunction = new string($3);}
         ;
 
 argumentsList:
-        datatype VARIABLE
-        | datatype VARIABLE ',' argumentsList
+        datatype VARIABLE                       { cout << "POP " << $2 << endl; symTable->addArgs(*currentFunction, $2, $1); }
+        | datatype VARIABLE ',' argumentsList   { cout << "POP " << $2 << endl; symTable->addArgs(*currentFunction, $2, $1);}
         ;
 
 arguments:
@@ -207,13 +256,13 @@ arguments:
         ;
 
 parametersList:
-        assignmentValue ',' parametersList
-        | assignmentValue
+        assignmentValue ',' parametersList {$3->push($1->type); $$ = $3;}
+        | assignmentValue                  {$$ = new queue<Type>(); $$->push($1->type);}
         ;
 
 parameters:
-        parametersList
-        | /* NULL */
+        parametersList {$$ = $1;}
+        | /* NULL */ {$$ = new queue<Type>();}
         ;
 
 case:
@@ -249,26 +298,23 @@ caseExpression:
                                         }
         | VARIABLE                      { 
                                                 Type t = symTable->getType($1);
-                                                if(t == Type::TYPE_INT || t == Type::TYPE_BOOL || t == Type::TYPE_CHAR)
-                                                    $$ = new Value{symTable->getValue($1), symTable->getType($1)};
-                                                else
-                                                        throwError("invalid case expression\n");
+                                                $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                                 cout << "PUSH " << $1 << endl;
                                         }
-        | caseExpression '<' caseExpression     { implementOperation(OP::LeT, forCount,&forStack);  $$ = $1;}
-        | caseExpression '>' caseExpression     { implementOperation(OP::GrT, forCount,&forStack); $$ = $1;}
-        | caseExpression LE caseExpression      { implementOperation(OP::LeE, forCount,&forStack); $$ = $1;}
-        | caseExpression GE caseExpression      { implementOperation(OP::GrE, forCount,&forStack); $$ = $1;}
-        | caseExpression EQ caseExpression      { implementOperation(OP::EQQ, forCount,&forStack); $$ = $1;}
-        | caseExpression NE caseExpression      { implementOperation(OP::NoE, forCount,&forStack); $$ = $1;}
-        | caseExpression '|' caseExpression     { implementOperation(OP::OR, forCount,&forStack); $$ = $1;}
-        | caseExpression '&' caseExpression     { implementOperation(OP::AND, forCount,&forStack); $$ = $1;}
-        | caseExpression '+' caseExpression     { implementOperation(OP::PLUS, forCount,&forStack); $$ = $1;}
-        | caseExpression '-' caseExpression     { implementOperation(OP::MINUS, forCount,&forStack); $$ = $1;}
-        | caseExpression '*' caseExpression     { implementOperation(OP::MULTIPLY, forCount,&forStack); $$ = $1;}
-        | caseExpression '/' caseExpression     { implementOperation(OP::DIVIDE, forCount,&forStack); $$ = $1;}
-        | '~' caseExpression                { implementOperation(OP::NOT, forCount,&forStack); $$ = $2;}
-        | '-' caseExpression                { implementOperation(OP::NEG, forCount,&forStack); $$ = $2;}
+        | caseExpression '<' caseExpression     { implementOperation(OP::LeT, forCount,&forStack, $1->type, $3->type);  $$ = $1;}
+        | caseExpression '>' caseExpression     { implementOperation(OP::GrT, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression LE caseExpression      { implementOperation(OP::LeE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression GE caseExpression      { implementOperation(OP::GrE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression EQ caseExpression      { implementOperation(OP::EQQ, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression NE caseExpression      { implementOperation(OP::NoE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '|' caseExpression     { implementOperation(OP::OR, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '&' caseExpression     { implementOperation(OP::AND, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '+' caseExpression     { implementOperation(OP::PLUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '-' caseExpression     { implementOperation(OP::MINUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '*' caseExpression     { implementOperation(OP::MULTIPLY, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '/' caseExpression     { implementOperation(OP::DIVIDE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | '~' caseExpression                { implementOperation(OP::NOT, forCount,&forStack, $2->type, $2->type); $$ = $2;}
+        | '-' caseExpression                { implementOperation(OP::NEG, forCount,&forStack, $2->type, $2->type); $$ = $2;}
         | '(' caseExpression ')'            { $$ = $2;}    
         ;
 
@@ -289,7 +335,12 @@ caseScope:
         ;
 
 expression:
-        FLOATING
+        FLOATING                        { $$ = $1;
+                                            if(forCount > 0)
+                                                forStack.push("PUSH " + std::to_string(*(float*)$1->value));
+                                            else
+                                                cout << "PUSH " << *(float*)$1->value << endl;
+                                        }
         | INTEGER                       { $$ = $1;
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(int*)$1->value));
@@ -307,30 +358,23 @@ expression:
                                                         forStack.push("PUSH " + (string)$1);
                                                 else
                                                         cout << "PUSH " << $1 << endl;
-                                                Type t = symTable->getType($1)
-                                                if(t == Type::TYPE_INT || t == Type::TYPE_BOOL || t == Type::TYPE_FLOAT)
-                                                {
+                                                Type t = symTable->getType($1);
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
-                                                }
-                                                else
-                                                {
-                                                throwError("invalid case expression\n"
-                                                }
                                         }
-        | expression '<' expression     { implementOperation(OP::LeT, forCount,&forStack);  $$ = $1; /* TODO: check on type and propagate*/}
-        | expression '>' expression     { implementOperation(OP::GrT, forCount,&forStack); $$ = $1;}
-        | expression LE expression      { implementOperation(OP::LeE, forCount,&forStack); $$ = $1;}
-        | expression GE expression      { implementOperation(OP::GrE, forCount,&forStack); $$ = $1;}
-        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forStack); $$ = $1;}
-        | expression NE expression      { implementOperation(OP::NoE, forCount,&forStack); $$ = $1;}
-        | expression '|' expression     { implementOperation(OP::OR, forCount,&forStack); $$ = $1;}
-        | expression '&' expression     { implementOperation(OP::AND, forCount,&forStack); $$ = $1;}
-        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forStack); $$ = $1;}
-        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forStack); $$ = $1;}
-        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forStack); $$ = $1;}
-        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forStack); $$ = $1;}
-        | '~' expression                { implementOperation(OP::NOT, forCount,&forStack); $$ = $2;}
-        | '-' expression                { implementOperation(OP::NEG, forCount,&forStack); $$ = $2;}
+        | expression '<' expression     { implementOperation(OP::LeT, forCount, &forStack, $1->type, $3->type);  $$ = $1; /* TODO: check on type and propagate*/}
+        | expression '>' expression     { implementOperation(OP::GrT, forCount, &forStack, $1->type, $3->type); $$ = $1;}
+        | expression LE expression      { implementOperation(OP::LeE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression GE expression      { implementOperation(OP::GrE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression NE expression      { implementOperation(OP::NoE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '|' expression     { implementOperation(OP::OR, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '&' expression     { implementOperation(OP::AND, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | '~' expression                { implementOperation(OP::NOT, forCount,&forStack, $2->type, $2->type); $$ = $2;}
+        | '-' expression                { implementOperation(OP::NEG, forCount,&forStack, $2->type, $2->type); $$ = $2;}
         | '(' expression ')'            { $$ = $2;}
         ;
 datatype:
@@ -342,11 +386,27 @@ datatype:
         ;
 
 scope:
-        scopeInit program '}' {symTable = symTable->getParentTable();}
+        scopeInit program '}' { 
+                                if(symTable->getFunctionName() != nullptr && symTable->getIsReturned() == false) {
+                                        throwError("Function " + *symTable->getFunctionName() + " is missing a return statement\n");
+                                }
+                                symTable->checkUnusedVariables();
+                                symTable = symTable->getParentTable();}
         ;
 
 scopeInit:
-        '{'       {symTable = new SymbolTable(symTable);}
+        '{'     {       
+                        symTable = new SymbolTable(symTable);
+                        if(currentFunction != nullptr) {
+                                symTable->setFunctionName(currentFunction);
+                                auto args = symTable->lookup(*currentFunction)->args;
+                                for(auto arg : *args) {
+                                       symTable->insert(arg.second, arg.first);
+                                       symTable->setValue(arg.second, new Value{(void*)1, arg.first});
+                                }
+                                currentFunction = nullptr;
+                        }
+                }
         ;
 
 /* funcScopeValue:
@@ -374,8 +434,9 @@ void yyerror(const char *s) {
 }
 
 void throwError(string s) {
-    const char *x = s.c_str();
-    yyerror(x);
+        cout << "Error at line " << yylineno << ": " << s << endl;
+        const char *x = s.c_str();
+        yyerror(x);
 }
 
 int main(int argc, char *argv[]) {

@@ -13,6 +13,7 @@
     "utility": "cpp",
     "random": "c",
     "valarray": "c",
-    "charconv": "c"
+    "charconv": "c",
+    "stdexcept": "cpp"
   }
 }
