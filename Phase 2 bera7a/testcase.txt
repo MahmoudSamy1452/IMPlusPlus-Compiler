@@ -70,7 +70,8 @@ function string Mahmoud (int y, string z) {
     };
     ret z;
 };
-string G = Mahmoud(1, "Moaaz", 1);
+string G = Mahmoud(1, "Moaaz");
 string x = "Moaaz";
 string y = x;
 int z = 1;
+const int q = 1;

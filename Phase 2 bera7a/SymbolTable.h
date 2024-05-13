@@ -52,4 +52,8 @@ public:
   void checkUnusedVariables();
 
   SymbolTable *getParentTable();
+
+  void printTable();
+
+  string enumTypeToString(Type type);
 };

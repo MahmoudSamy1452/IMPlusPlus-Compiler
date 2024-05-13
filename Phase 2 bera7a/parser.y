@@ -6,6 +6,7 @@
     #include <queue>
     #include <string>
     #include <fstream>
+    #include <iomanip>
 }
 
 %{
@@ -29,7 +30,11 @@
     extern int yylineno;
 
     ofstream quadFile("Quadruples.txt");
+    ofstream errorMessages("errorMessages.txt");
+    ofstream symbolTable("symbolTable.txt");
 
+    
+    
 %}
 
 %union {
@@ -57,10 +62,16 @@
 
 %%
 
-program:
-        statement ';' program {symTable->checkUnusedVariables();}
-        | /* NULL */    {symTable->checkUnusedVariables();}
-        | ';' program {symTable->checkUnusedVariables();}
+program: 
+        { symbolTable << "{" << endl;} lines   {
+                symTable->checkUnusedVariables(); 
+                symTable->printTable(); symbolTable << "}" << endl;}
+        ;
+
+lines:  
+        statement ';' lines
+        | /* NULL */
+        | ';' lines
         ;
 
 declaration:
@@ -74,13 +85,13 @@ declaration:
                                                                 if(forCount > 0)
                                                                         forStack.push("POP " + (string)$2);
                                                                 else
-                                                                        cout << "POP " << $2 << endl;
+                                                                        quadFile << "POP " << $2 << endl;
                                                         }
         | CONST datatype VARIABLE '=' assignmentValue   {       symTable->insert($3, $2, $5->value, true);
                                                                 if(forCount > 0)
                                                                         forStack.push("POP " + (string)$3);
                                                                 else
-                                                                        cout << "POP " << $3 << endl;
+                                                                        quadFile << "POP " << $3 << endl;
                                                         }
         ;
 
@@ -91,13 +102,13 @@ assignment:
                                                                 forStack.push("POP " + (string)$1);
                                                           }
                                                           else
-                                                              cout << "POP " << $1 << endl;
+                                                              quadFile << "POP " << $1 << endl;
                                                         }
         ;
 
 assignmentValue:
-        CHAR { cout << "PUSH " << *(char*)$1->value << endl; $$ = $1; }
-        | CHARARRAY { cout << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl; $$ = $1; }
+        CHAR { quadFile << "PUSH " << *(char*)$1->value << endl; $$ = $1; }
+        | CHARARRAY { quadFile << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl; $$ = $1; }
         | expression
         | VARIABLE '(' parameters ')' {
                                         if(symTable->lookup($1) == nullptr) {
@@ -109,7 +120,7 @@ assignmentValue:
                                         else if(symTable->lookup($1)->args->size() != $3->size()) {
                                             throwError("function " + string($1) + " argument size mismatch\n");
                                         }
-                                        cout << "CALL " << $1 << endl; 
+                                        quadFile << "CALL " << $1 << endl; 
                                         $$ = new Value{nullptr, *symTable->lookup($1)->returnType};
                                 }
         ;
@@ -122,11 +133,11 @@ initialization:
 statement:
         initialization 
         | whileLoop '(' expression endBracketJump scope                       { 
-                                                                                cout << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                quadFile << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                 }
         | repeatLoop scope UNTIL '(' expression ')'                           { 
-                                                                                cout << "JZ Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                quadFile << "JZ Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                 }
         | forLoop expression semicolonJump assignment endForDeclaration scope {
@@ -137,16 +148,16 @@ statement:
                                                                                 }
                                                                                 forStack.pop();
                                                                                 while (!tempStack.empty()){
-                                                                                    cout << tempStack.top() << endl;
+                                                                                    quadFile << tempStack.top() << endl;
                                                                                     tempStack.pop();
                                                                                 }
-                                                                                cout << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                quadFile << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                }
-        | SWITCH '(' caseExpression endCaseExpression '{' case '}'              { cout << "OutLabel" << switchStack.top() << ":" << endl;                                                                       switchStack.pop(); labelsStack.pop(); }
+        | SWITCH '(' caseExpression endCaseExpression '{' case '}'              { quadFile << "OutLabel" << switchStack.top() << ":" << endl;                                                                       switchStack.pop(); labelsStack.pop(); }
         | scope
-        | ifCondition '(' expression endBracketJump THEN scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
-        | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { cout << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
+        | ifCondition '(' expression endBracketJump THEN scope { quadFile << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
+        | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { quadFile << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
         | funcDeclaration scope 
         | VARIABLE '(' parameters ')' {
                                         if(symTable->lookup($1) == nullptr) {
@@ -166,12 +177,11 @@ statement:
                                             }
                                             params->pop();
                                         }
-                                        cout << "CALL " << $1 << endl; 
+                                        quadFile << "CALL " << $1 << endl; 
                                 }
         | RETURN assignmentValue {
-                                    cout << "POP " << "$retvalue" << endl;
-                                    cout << "RET " << "$retvalue" << endl;
-                                //     cout << "function name: " <<symTable->getFunctionName() << endl;
+                                    quadFile << "POP " << "$retvalue" << endl;
+                                    quadFile << "RET " << "$retvalue" << endl;
                                     if(symTable->getFunctionName() == nullptr) {
                                         throwError("return statement outside function\n");
                                     }
@@ -179,7 +189,7 @@ statement:
                                     symTable->setIsReturned();
                                  }
         | RETURN                {
-                                    cout << "RET" << endl;
+                                    quadFile << "RET" << endl;
                                     if(symTable->getFunctionName() == nullptr) {
                                         throwError("return statement outside function\n");
                                     }
@@ -190,21 +200,21 @@ statement:
 
 whileLoop:
         WHILE                   { 
-                                        cout << endl << "Label" << labels << ": " << endl;
+                                        quadFile << endl << "Label" << labels << ": " << endl;
                                         labelsStack.push(labels++);
                                 }
         ;
 
 repeatLoop:
         REPEAT                  { 
-                                        cout << endl << "Label" << labels << ": " << endl;
+                                        quadFile << endl << "Label" << labels << ": " << endl;
                                         labelsStack.push(labels++);
                                 }
         ;
 
 forLoop:
         FOR '(' initialization ';'      { 
-                                                cout << endl << "Label" << labels << ": " << endl;
+                                                quadFile << endl << "Label" << labels << ": " << endl;
                                                 labelsStack.push(labels++);
                                         }
         ;
@@ -216,16 +226,15 @@ ifCondition:
         ;
 
 endBracketJump:
-        ')' { cout << "JZ OutLabel" << labelsStack.top() << endl; }
+        ')' { quadFile << "JZ OutLabel" << labelsStack.top() << endl; }
         ;
 
 endCaseExpression:
-        ')' { cout << "POP $t" << labels << endl; labelsStack.push(labels++); switchStack.push(labels++);
-                cout << "Stack top in endCaseExpression: " << labelsStack.top() << endl; }
+        ')' { quadFile << "POP $t" << labels << endl; labelsStack.push(labels++); switchStack.push(labels++); }
         ;
 
 semicolonJump:
-        ';' { cout << "JZ OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
+        ';' { quadFile << "JZ OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
         ;
 
 endForDeclaration:
@@ -233,7 +242,7 @@ endForDeclaration:
         ;
 
 elseLabel:
-        ELSE { cout << "JMP OutLabel" << labels << '\n' << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); labelsStack.push(labels++); }
+        ELSE { quadFile << "JMP OutLabel" << labels << '\n' << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); labelsStack.push(labels++); }
         ;
 
 funcDeclaration:
@@ -241,13 +250,13 @@ funcDeclaration:
         ;
 
 funcHeader:
-        FUNCTION datatype VARIABLE  { cout << $3 << ':' << endl; symTable->insert($3, Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type($2)); currentFunction = new string($3);}
-        | FUNCTION VOID VARIABLE   { cout << $3 << ':' << endl; symTable->insert($3, Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type(Type::TYPE_VOID)); currentFunction = new string($3);}
+        FUNCTION datatype VARIABLE  { quadFile << $3 << ':' << endl; symTable->insert($3, Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type($2)); currentFunction = new string($3);}
+        | FUNCTION VOID VARIABLE   { quadFile << $3 << ':' << endl; symTable->insert($3, Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type(Type::TYPE_VOID)); currentFunction = new string($3);}
         ;
 
 argumentsList:
-        datatype VARIABLE                       { cout << "POP " << $2 << endl; symTable->addArgs(*currentFunction, $2, $1); }
-        | datatype VARIABLE ',' argumentsList   { cout << "POP " << $2 << endl; symTable->addArgs(*currentFunction, $2, $1);}
+        datatype VARIABLE                       { quadFile << "POP " << $2 << endl; symTable->addArgs(*currentFunction, $2, $1); }
+        | datatype VARIABLE ',' argumentsList   { quadFile << "POP " << $2 << endl; symTable->addArgs(*currentFunction, $2, $1);}
         ;
 
 arguments:
@@ -266,16 +275,8 @@ parameters:
         ;
 
 case:
-        CASE caseExpression caseColon caseScope                 { 
-                                                                        // cout << "JMP OutLabel" << switchStack.top() << endl << "label" << labelsStack.top() << ":" << endl;
-                                                                        // labelsStack.pop();
-                                                                        cout << "Stack top in case: " << labelsStack.top() << endl;
-                                                                }
-        | CASE caseExpression caseColon caseScope case          { 
-                                                                        // cout << "JMP OutLabel" << switchStack.top() << endl << "label" << labelsStack.top() << ":" << endl;
-                                                                        // labelsStack.pop();
-                                                                        cout << "Stack top in case case: " << labelsStack.top() << endl;
-                                                                }
+        CASE caseExpression caseColon caseScope                
+        | CASE caseExpression caseColon caseScope case
         ;
 
 /* caseCondition:
@@ -286,20 +287,20 @@ case:
 caseExpression:
         INTEGER                         {  
                                                 $$ = $1;
-                                                cout << "PUSH " << *(int*)$1->value << endl;
+                                                quadFile << "PUSH " << *(int*)$1->value << endl;
                                         }
         | BOOLEAN                       { 
                                                 $$ = $1;
-                                                cout << "PUSH " << *(bool*)$1->value << endl ;
+                                                quadFile << "PUSH " << *(bool*)$1->value << endl ;
                                         }
         | CHAR                          { 
                                                 $$ = $1;
-                                                cout << "PUSH " << *(char*)$1->value << endl;
+                                                quadFile << "PUSH " << *(char*)$1->value << endl;
                                         }
         | VARIABLE                      { 
                                                 Type t = symTable->getType($1);
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
-                                                cout << "PUSH " << $1 << endl;
+                                                quadFile << "PUSH " << $1 << endl;
                                         }
         | caseExpression '<' caseExpression     { implementOperation(OP::LeT, forCount,&forStack, $1->type, $3->type);  $$ = $1;}
         | caseExpression '>' caseExpression     { implementOperation(OP::GrT, forCount,&forStack, $1->type, $3->type); $$ = $1;}
@@ -320,17 +321,15 @@ caseExpression:
 
 caseColon:
         ':'                     {   
-                                        cout << "PUSH $t" << labelsStack.top() << endl << "EQ" << endl << "JZ label" << labels << endl; 
+                                        quadFile << "PUSH $t" << labelsStack.top() << endl << "EQ" << endl << "JZ label" << labels << endl; 
                                         labelsStack.push(labels++); 
-                                        cout << "Stack top in caseColon: " << labelsStack.top() << endl;
                                 }
         ;
 
 caseScope:
         scope                   { 
-                                        cout << "JMP OutLabel" << switchStack.top() << endl << "label " << labelsStack.top() << ":" << endl;
+                                        quadFile << "JMP OutLabel" << switchStack.top() << endl << "label " << labelsStack.top() << ":" << endl;
                                         labelsStack.pop();
-                                        cout << "Stack top in caseScope: " << labelsStack.top() << endl;
                                 }
         ;
 
@@ -339,25 +338,25 @@ expression:
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(float*)$1->value));
                                             else
-                                                cout << "PUSH " << *(float*)$1->value << endl;
+                                                quadFile << "PUSH " << *(float*)$1->value << endl;
                                         }
         | INTEGER                       { $$ = $1;
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(int*)$1->value));
                                             else
-                                                cout << "PUSH " << *(int*)$1->value << endl;
+                                                quadFile << "PUSH " << *(int*)$1->value << endl;
                                         }
         | BOOLEAN                       { $$ = $1;
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(bool*)$1->value));
                                             else
-                                                cout << "PUSH " << *(int*)$1->value << endl ;
+                                                quadFile << "PUSH " << *(int*)$1->value << endl ;
                                         }
         | VARIABLE                      { 
                                                 if(forCount > 0)
                                                         forStack.push("PUSH " + (string)$1);
                                                 else
-                                                        cout << "PUSH " << $1 << endl;
+                                                        quadFile << "PUSH " << $1 << endl;
                                                 Type t = symTable->getType($1);
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                         }
@@ -386,16 +385,20 @@ datatype:
         ;
 
 scope:
-        scopeInit program '}' { 
+        scopeInit lines '}' { 
                                 if(symTable->getFunctionName() != nullptr && symTable->getIsReturned() == false) {
                                         throwError("Function " + *symTable->getFunctionName() + " is missing a return statement\n");
                                 }
                                 symTable->checkUnusedVariables();
-                                symTable = symTable->getParentTable();}
+                                symTable->printTable();
+                                symTable = symTable->getParentTable();
+                                symbolTable << "}" << endl;
+                                }
         ;
 
 scopeInit:
         '{'     {       
+                        symbolTable << "{" << endl;
                         symTable = new SymbolTable(symTable);
                         if(currentFunction != nullptr) {
                                 symTable->setFunctionName(currentFunction);
@@ -430,13 +433,11 @@ funcScopeVoid:
 
 void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
-    exit(1);
 }
 
 void throwError(string s) {
-        cout << "Error at line " << yylineno << ": " << s << endl;
+        errorMessages << "Error at line " << yylineno << ": " << s << endl;
         const char *x = s.c_str();
-        yyerror(x);
 }
 
 int main(int argc, char *argv[]) {

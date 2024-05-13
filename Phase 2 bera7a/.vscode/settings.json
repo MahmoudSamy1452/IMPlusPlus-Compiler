@@ -14,6 +14,7 @@
     "random": "c",
     "valarray": "c",
     "charconv": "c",
-    "stdexcept": "cpp"
+    "stdexcept": "cpp",
+    "iomanip": "cpp"
   }
 }

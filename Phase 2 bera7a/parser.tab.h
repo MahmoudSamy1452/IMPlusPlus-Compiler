@@ -44,12 +44,11 @@
     #include <queue>
     #include <string>
     #include <fstream>
-    #include <iomanip>
 
 
 
 /* Line 1676 of yacc.c  */
-#line 53 "y.tab.h"
+#line 52 "parser.tab.h"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -87,36 +86,6 @@
      NE = 285
    };
 #endif
-/* Tokens.  */
-#define CHAR 258
-#define CHARARRAY 259
-#define INTEGER 260
-#define FLOATING 261
-#define BOOLEAN 262
-#define VARIABLE 263
-#define WHILE 264
-#define REPEAT 265
-#define UNTIL 266
-#define FOR 267
-#define SWITCH 268
-#define CASE 269
-#define IF 270
-#define THEN 271
-#define ELSE 272
-#define FUNCTION 273
-#define RETURN 274
-#define INT 275
-#define FLOAT 276
-#define CHARACTER 277
-#define STRING 278
-#define BOOL 279
-#define VOID 280
-#define CONST 281
-#define GE 282
-#define LE 283
-#define EQ 284
-#define NE 285
-
 
 
 
@@ -125,7 +94,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 40 "parser.y"
+#line 37 "parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
@@ -136,7 +105,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 140 "y.tab.h"
+#line 109 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

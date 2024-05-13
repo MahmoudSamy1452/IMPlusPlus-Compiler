@@ -462,9 +462,9 @@ goto find_rule; \
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 ".\\lexer.l"
+#line 1 "lexer.l"
 #define INITIAL 0
-#line 3 ".\\lexer.l"
+#line 3 "lexer.l"
   #include "y.tab.h"
   #include "structs.h"
   #include "enums.h"
@@ -621,7 +621,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 11 ".\\lexer.l"
+#line 11 "lexer.l"
 
 
 #line 628 "lex.yy.c"
@@ -717,7 +717,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	{ /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
-#line 13 ".\\lexer.l"
+#line 13 "lexer.l"
 {
                           int* p = new int(atoi(yytext));
                           yylval.val = new Value{p, Type::TYPE_INT};
@@ -726,7 +726,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 ".\\lexer.l"
+#line 19 "lexer.l"
 {
                           double* p = new double(atof(yytext));
                           yylval.val = new Value{p, Type::TYPE_FLOAT};
@@ -735,7 +735,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 ".\\lexer.l"
+#line 25 "lexer.l"
 {
                           char* p = new char(atof(yytext));
                           yylval.val = new Value{p, Type::TYPE_CHAR};
@@ -744,7 +744,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 31 ".\\lexer.l"
+#line 31 "lexer.l"
 {
                           yylval.val = new Value{(void*)yytext, Type::TYPE_CHAR_ARRAY};
                           return CHARARRAY;
@@ -752,7 +752,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 36 ".\\lexer.l"
+#line 36 "lexer.l"
 {
 
                           int* p = new int(strcmp(yytext, "True") == 0 ? 1 : 0);
@@ -762,7 +762,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 43 ".\\lexer.l"
+#line 43 "lexer.l"
 {
                           yylval.string = strdup(yytext);
                           return *yytext;
@@ -770,117 +770,117 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 48 ".\\lexer.l"
+#line 48 "lexer.l"
 return WHILE;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 49 ".\\lexer.l"
+#line 49 "lexer.l"
 return REPEAT;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 50 ".\\lexer.l"
+#line 50 "lexer.l"
 return UNTIL;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 51 ".\\lexer.l"
+#line 51 "lexer.l"
 return FOR;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 52 ".\\lexer.l"
+#line 52 "lexer.l"
 return SWITCH;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 53 ".\\lexer.l"
+#line 53 "lexer.l"
 return CASE;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 54 ".\\lexer.l"
+#line 54 "lexer.l"
 return IF;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 55 ".\\lexer.l"
+#line 55 "lexer.l"
 return THEN;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 56 ".\\lexer.l"
+#line 56 "lexer.l"
 return ELSE;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 57 ".\\lexer.l"
+#line 57 "lexer.l"
 return FUNCTION;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 58 ".\\lexer.l"
+#line 58 "lexer.l"
 return RETURN;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 59 ".\\lexer.l"
+#line 59 "lexer.l"
 return INT;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 60 ".\\lexer.l"
+#line 60 "lexer.l"
 return FLOAT;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 61 ".\\lexer.l"
+#line 61 "lexer.l"
 return BOOL;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 62 ".\\lexer.l"
+#line 62 "lexer.l"
 return CHARACTER;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 63 ".\\lexer.l"
+#line 63 "lexer.l"
 return STRING;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 64 ".\\lexer.l"
+#line 64 "lexer.l"
 return CONST;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 65 ".\\lexer.l"
+#line 65 "lexer.l"
 return VOID;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 66 ".\\lexer.l"
+#line 66 "lexer.l"
 return GE;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 67 ".\\lexer.l"
+#line 67 "lexer.l"
 return LE;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 68 ".\\lexer.l"
+#line 68 "lexer.l"
 return EQ;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 69 ".\\lexer.l"
+#line 69 "lexer.l"
 return NE;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 71 ".\\lexer.l"
+#line 71 "lexer.l"
 {
                           yylval.string = strdup(yytext);
                           return VARIABLE;
@@ -888,22 +888,22 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 76 ".\\lexer.l"
+#line 76 "lexer.l"
 ;       /* ignore whitespace */
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 77 ".\\lexer.l"
+#line 77 "lexer.l"
 ;       /* ignore comments */
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 79 ".\\lexer.l"
+#line 79 "lexer.l"
 ; yyerror("Unknown character");
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 80 ".\\lexer.l"
+#line 80 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 910 "lex.yy.c"
@@ -1790,7 +1790,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 80 ".\\lexer.l"
+#line 80 "lexer.l"
 
 int yywrap(void) {
     return 1;

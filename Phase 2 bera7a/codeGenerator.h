@@ -5,32 +5,33 @@
 #include <stack>
 using namespace std;
 
-void printValue(Value *val)
-{
-    if (val->isTemp)
-    {
-        cout << "$R0";
-        return;
-    }
-    switch (val->type)
-    {
-    case TYPE_INT:
-        std::cout << *(int *)val->value;
-        break;
-    case TYPE_FLOAT:
-        std::cout << *(float *)val->value;
-        break;
-    case TYPE_BOOL:
-        std::cout << *(bool *)val->value;
-        break;
-    case TYPE_CHAR_ARRAY:
-        std::cout << "$R0";
-        break;
-    }
-}
+// void printValue(Value *val)
+// {
+//     if (val->isTemp)
+//     {
+//         quadFile << "$R0";
+//         return;
+//     }
+//     switch (val->type)
+//     {
+//     case TYPE_INT:
+//         std::quadFile << *(int *)val->value;
+//         break;
+//     case TYPE_FLOAT:
+//         std::quadFile << *(float *)val->value;
+//         break;
+//     case TYPE_BOOL:
+//         std::quadFile << *(bool *)val->value;
+//         break;
+//     case TYPE_CHAR_ARRAY:
+//         std::quadFile << "$R0";
+//         break;
+//     }
+// }
 
 void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1, Type type2)
 {
+    extern ofstream quadFile;
     if (type1 == Type::TYPE_CHAR_ARRAY || type2 == Type::TYPE_CHAR_ARRAY || type1 == Type::TYPE_CHAR || type2 == Type::TYPE_CHAR)
     {
         throw invalid_argument("Invalid operation on string");
@@ -91,46 +92,46 @@ void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1
         switch (op)
         {
         case OP::PLUS:
-            cout << "ADD " << endl;
+            quadFile << "ADD " << endl;
             break;
         case OP::MINUS:
-            cout << "SUB " << endl;
+            quadFile << "SUB " << endl;
             break;
         case OP::MULTIPLY:
-            cout << "MUL " << endl;
+            quadFile << "MUL " << endl;
             break;
         case OP::DIVIDE:
-            cout << "DIV " << endl;
+            quadFile << "DIV " << endl;
             break;
         case OP::AND:
-            cout << "AND" << endl;
+            quadFile << "AND" << endl;
             break;
         case OP::OR:
-            cout << "OR" << endl;
+            quadFile << "OR" << endl;
             break;
         case OP::NOT:
-            cout << "NOT" << endl;
+            quadFile << "NOT" << endl;
             break;
         case OP::LeT:
-            cout << "LT " << endl;
+            quadFile << "LT " << endl;
             break;
         case OP::GrT:
-            cout << "GT " << endl;
+            quadFile << "GT " << endl;
             break;
         case OP::LeE:
-            cout << "LE " << endl;
+            quadFile << "LE " << endl;
             break;
         case OP::GrE:
-            cout << "GE" << endl;
+            quadFile << "GE" << endl;
             break;
         case OP::EQQ:
-            cout << "EQ " << endl;
+            quadFile << "EQ " << endl;
             break;
         case OP::NoE:
-            cout << "NE" << endl;
+            quadFile << "NE" << endl;
             break;
         case OP::NEG:
-            cout << "NEG" << endl;
+            quadFile << "NEG" << endl;
             break;
         default:
             break;
