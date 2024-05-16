@@ -76,10 +76,10 @@ lines:
         ;
 
 declaration:
-        datatype VARIABLE                               {       
+        datatype VARIABLE                               {
                                                                 symTable->insert($2, $1);
                                                         }
-        | datatype VARIABLE '=' assignmentValue         { 
+        | datatype VARIABLE '=' assignmentValue         {
 
                                                                 symTable->insert($2, $1, $4->value);
                                                                 symTable->setValue($2, $4);
@@ -108,7 +108,7 @@ assignment:
         ;
 
 assignmentValue:
-        CHAR { quadFile << "PUSH " << *(char*)$1->value << endl; $$ = $1; }
+        CHAR { quadFile << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl; $$ = $1; }
         | CHARARRAY { quadFile << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl; $$ = $1; }
         | expression
         | VARIABLE '(' parameters ')' {
@@ -214,7 +214,7 @@ repeatLoop:
         ;
 
 forLoop:
-        FOR '(' initialization ';'      { 
+        FOR '(' initialization ';'      {
                                                 quadFile << endl << "Label" << labels << ": " << endl;
                                                 labelsStack.push(labels++);
                                         }
@@ -296,7 +296,7 @@ caseExpression:
                                         }
         | CHAR                          { 
                                                 $$ = $1;
-                                                quadFile << "PUSH " << *(char*)$1->value << endl;
+                                                quadFile << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl;
                                         }
         | VARIABLE                      { 
                                                 Type t = symTable->getType($1);
@@ -329,7 +329,7 @@ caseColon:
 
 caseScope:
         scope                   { 
-                                        quadFile << "JMP OutLabel" << switchStack.top() << endl << "label " << labelsStack.top() << ":" << endl;
+                                        quadFile << "JMP OutLabel" << switchStack.top() << endl << "label" << labelsStack.top() << ":" << endl;
                                         labelsStack.pop();
                                 }
         ;
@@ -337,9 +337,9 @@ caseScope:
 expression:
         FLOATING                        { $$ = $1;
                                             if(forCount > 0)
-                                                forStack.push("PUSH " + std::to_string(*(float*)$1->value));
+                                                forStack.push("PUSH " + std::to_string(*(double*)$1->value));
                                             else
-                                                quadFile << "PUSH " << *(float*)$1->value << endl;
+                                                quadFile << "PUSH " << *(double*)$1->value << endl;
                                         }
         | INTEGER                       { $$ = $1;
                                             if(forCount > 0)
@@ -386,7 +386,7 @@ datatype:
         ;
 
 scope:
-        scopeInit lines '}' { 
+        scopeInit lines '}' {
                                 if(symTable->getFunctionName() != nullptr && symTable->getIsReturned() == false) {
                                         throwError("Function " + *symTable->getFunctionName() + " is missing a return statement\n");
                                 }
@@ -398,7 +398,7 @@ scope:
         ;
 
 scopeInit:
-        '{'     {       
+        '{'     {
                         symbolTable << "{" << endl;
                         symTable = new SymbolTable(symTable);
                         if(currentFunction != nullptr) {
@@ -409,6 +409,11 @@ scopeInit:
                                        symTable->setValue(arg.second, new Value{(void*)1, arg.first});
                                 }
                                 currentFunction = nullptr;
+                        }
+                        if(forInit) {
+                                symTable->insert(forInitPair.first.first, forInitPair.first.second, forInitPair.second.first, forInitPair.second.second);
+                                forInit = false;
+                                forInitPair = make_pair(make_pair("", Type::TYPE_INT), make_pair(nullptr, false));
                         }
                 }
         ;

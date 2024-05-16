@@ -3,6 +3,7 @@
 #include "structs.h"
 #include <iostream>
 #include <stack>
+extern void throwError(string msg);
 using namespace std;
 
 // void printValue(Value *val)
@@ -34,7 +35,7 @@ void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1
     extern ofstream quadFile;
     if (type1 == Type::TYPE_CHAR_ARRAY || type2 == Type::TYPE_CHAR_ARRAY || type1 == Type::TYPE_CHAR || type2 == Type::TYPE_CHAR)
     {
-        throw invalid_argument("Invalid operation on string");
+        throwError("Invalid operation on string");
     }
 
     if (forCount > 0)

@@ -23,8 +23,7 @@
                         }
                         
 \'[^\']?\'              {
-                          char* p = new char(atof(yytext));
-                          yylval.val = new Value{p, Type::TYPE_CHAR};
+                          yylval.val = new Value{(void*)yytext, Type::TYPE_CHAR};
                           return CHAR;
                         }                       
 
