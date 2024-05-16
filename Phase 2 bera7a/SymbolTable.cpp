@@ -32,7 +32,7 @@ void SymbolTable::insert(string name, Type type, void *value, bool isConst, vect
                          Type *returnType) {
     
     if (this->table.find(name) != this->table.end()) {
-        throwError("Variable already defined in this scope");
+        throwError(name + " already defined in this scope");
     }
     
     if (!(type >= Type::TYPE_BOOL && type <= Type::TYPE_FUNC))
@@ -64,8 +64,10 @@ SymbolTableEntry *SymbolTable::lookup(string name) {
 
 void *SymbolTable::getValue(string name) {
     SymbolTableEntry *table = this->lookup(name);
-    if (table == nullptr)
+    if (table == nullptr){
         throwError("Variable not found");
+        return nullptr;
+    }
     if (table->value == nullptr)
         throwError("Variable was not initialized");
     table->isUsed = true;
@@ -74,8 +76,9 @@ void *SymbolTable::getValue(string name) {
 
 Type SymbolTable::getType(string name) {
     SymbolTableEntry *table = this->lookup(name);
-    if (table == nullptr)
-        throwError("Variable not found");
+    if (table == nullptr) {
+        return Type::TYPE_ERROR;
+    }
     return table->type;
 }
 
@@ -94,9 +97,11 @@ void SymbolTable::setValue(string name, Value *val) {
         throwError("Cannot assign to const variable");
     }
     
-    if (entry->type != val->type) {
+    if (entry->type != val->type && val->type != Type::TYPE_ERROR) {
         throwError("Type mismatch");
     }
+    if(val->type == Type::TYPE_ERROR)
+        return;
     
     entry->value = val->value;
 }

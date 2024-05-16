@@ -301,7 +301,6 @@ caseExpression:
                                                 quadFile << "PUSH " << (string)reinterpret_cast<char*>($1->value) << endl;
                                         }
         | VARIABLE                      { 
-                                                Type t = symTable->getType($1);
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                                 quadFile << "PUSH " << $1 << endl;
                                         }
@@ -360,7 +359,6 @@ expression:
                                                         forStack.push("PUSH " + (string)$1);
                                                 else
                                                         quadFile << "PUSH " << $1 << endl;
-                                                Type t = symTable->getType($1);
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                         }
         | expression '<' expression     { implementOperation(OP::LeT, forCount, &forStack, $1->type, $3->type);  $$ = $1; /* TODO: check on type and propagate*/}
