@@ -1,5 +1,5 @@
 @echo off
 
-start "" "mahmoud.exe" "testcase.txt"
+start "" "compiler.exe" "testcase.txt"
 
 pause

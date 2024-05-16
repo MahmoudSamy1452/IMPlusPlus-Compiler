@@ -30,3 +30,7 @@
 .transition-x {
     transition: transform 300ms ease-in-out;
 }
+
+.CodeMirror-hscrollbar {
+    overflow-x: hidden !important;
+}

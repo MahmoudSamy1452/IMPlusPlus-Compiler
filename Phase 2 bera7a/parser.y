@@ -66,6 +66,7 @@ program:
         { symbolTable << "{" << endl;} lines   {
                 symTable->checkUnusedVariables(); 
                 symTable->printTable(); symbolTable << "}" << endl;}
+        | error { throwError("Syntax Error"); YYABORT; }
         ;
 
 lines:  
