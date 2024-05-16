@@ -29,6 +29,26 @@ using namespace std;
 //         break;
 //     }
 // }
+string enumTypeToString(Type type) {
+    switch (type) {
+        case Type::TYPE_BOOL:
+            return "bool";
+        case Type::TYPE_FLOAT:
+            return "float";
+        case Type::TYPE_INT:
+            return "int";
+        case Type::TYPE_CHAR:
+            return "char";
+        case Type::TYPE_VOID:
+            return "void";
+        case Type::TYPE_CHAR_ARRAY:
+            return "char[]";
+        case Type::TYPE_FUNC:
+            return "function";
+        default:
+            return "N/A";
+    }
+}
 
 void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1, Type type2)
 {
@@ -37,9 +57,21 @@ void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1
     {
         throwError("Invalid operation on string");
     }
+    
+    
 
     if (forCount > 0)
     {
+        if (type1 > type2)
+        {
+            forStack->push("CAST " + enumTypeToString(type1));
+        }
+        else if (type1 < type2)
+        {
+            forStack->push("POP $R1");
+            forStack->push("CAST " + enumTypeToString(type2));
+            forStack->push("PUSH $R1");
+        }
         switch (op)
         {
         case OP::PLUS:
@@ -90,6 +122,16 @@ void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1
     }
     else
     {
+        if (type1 > type2)
+        {
+            quadFile << "CAST " << enumTypeToString(type1) << " " << endl;
+        }
+        else if (type1 < type2)
+        {
+            quadFile << "POP $R1" << endl;
+            quadFile << "CAST " << enumTypeToString(type2) << " " << endl;
+            quadFile << "PUSH $R1" << endl;
+        }
         switch (op)
         {
         case OP::PLUS:

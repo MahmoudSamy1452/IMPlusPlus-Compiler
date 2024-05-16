@@ -3,6 +3,10 @@
 
 extern void throwError(string msg);
 
+extern ofstream quadFile;
+extern int forCount;
+extern std::stack <string> forStack;
+
 SymbolTable::SymbolTable(SymbolTable *parent) {
     this->parent = parent;
 }
@@ -11,8 +15,7 @@ void SymbolTable::setFunctionName(string *name) {
     this->functionName = name;
 }
 
-string *SymbolTable::getCurrentFunctionName()
-{
+string *SymbolTable::getCurrentFunctionName() {
     if (this->parent == nullptr && this->functionName == nullptr)
         return nullptr;
     if (this->functionName == nullptr)
@@ -20,8 +23,7 @@ string *SymbolTable::getCurrentFunctionName()
     return this->functionName;
 }
 
-string *SymbolTable::getFunctionName()
-{
+string *SymbolTable::getFunctionName() {
     return this->functionName;
 }
 
@@ -30,6 +32,13 @@ bool SymbolTable::getIsReturned() {
 }
 
 void SymbolTable::setIsReturned() {
+    if (this->parent == nullptr) {
+        return;
+    }
+    if (this->functionName == nullptr) {
+        this->parent->setIsReturned();
+        return;
+    }
     this->isReturned = true;
 }
 
@@ -69,7 +78,7 @@ SymbolTableEntry *SymbolTable::lookup(string name) {
 
 void *SymbolTable::getValue(string name) {
     SymbolTableEntry *table = this->lookup(name);
-    if (table == nullptr){
+    if (table == nullptr) {
         throwError("Variable not found");
         return nullptr;
     }
@@ -101,11 +110,16 @@ void SymbolTable::setValue(string name, Value *val) {
     if (entry->isConst) {
         throwError("Cannot assign to const variable");
     }
-    
-    if (entry->type != val->type && val->type != Type::TYPE_ERROR) {
+    if (entry->type != val->type && entry->type <= Type::TYPE_FLOAT && val->type <= Type::TYPE_FLOAT) {
+        if (forCount > 0)
+            forStack.push("CAST " + enumTypeToString(entry->type));
+        
+        else
+            quadFile << "CAST " << enumTypeToString(entry->type) << endl;
+    } else if (entry->type != val->type && val->type != Type::TYPE_ERROR) {
         throwError("Type mismatch");
     }
-    if(val->type == Type::TYPE_ERROR)
+    if (val->type == Type::TYPE_ERROR)
         return;
     
     entry->value = val->value;
