@@ -136,11 +136,11 @@ initialization:
 statement:
         initialization 
         | whileLoop '(' expression endBracketJump scope                       { 
-                                                                                quadFile << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                quadFile << "JMP &Label" << labelsStack.top() << endl << "&OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                 }
         | repeatLoop scope UNTIL '(' expression ')'                           { 
-                                                                                quadFile << "JZ Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                quadFile << "JZ &Label" << labelsStack.top() << endl << "&OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                 }
         | forLoop expression semicolonJump assignment endForDeclaration scope {
@@ -154,13 +154,13 @@ statement:
                                                                                     quadFile << tempStack.top() << endl;
                                                                                     tempStack.pop();
                                                                                 }
-                                                                                quadFile << "JMP Label" << labelsStack.top() << endl << "OutLabel" << labelsStack.top() << ": " << endl << endl;
+                                                                                quadFile << "JMP &Label" << labelsStack.top() << endl << "&OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
                                                                                }
-        | SWITCH '(' caseExpression endCaseExpression '{' case '}'              { quadFile << "OutLabel" << switchStack.top() << ":" << endl;                                                                       switchStack.pop(); labelsStack.pop(); }
+        | SWITCH '(' caseExpression endCaseExpression '{' case '}'              { quadFile << "&OutLabel" << switchStack.top() << ":" << endl; switchStack.pop(); labelsStack.pop(); }
         | scope
-        | ifCondition '(' expression endBracketJump THEN scope { quadFile << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
-        | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { quadFile << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
+        | ifCondition '(' expression endBracketJump THEN scope { quadFile << "&OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
+        | ifCondition '(' expression endBracketJump THEN scope elseLabel scope { quadFile << "&OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
         | funcDeclaration scope 
         | VARIABLE '(' parameters ')' {
                                         if(symTable->lookup($1) == nullptr) {
@@ -203,21 +203,21 @@ statement:
 
 whileLoop:
         WHILE                   { 
-                                        quadFile << endl << "Label" << labels << ": " << endl;
+                                        quadFile << endl << "&Label" << labels << ": " << endl;
                                         labelsStack.push(labels++);
                                 }
         ;
 
 repeatLoop:
         REPEAT                  { 
-                                        quadFile << endl << "Label" << labels << ": " << endl;
+                                        quadFile << endl << "&Label" << labels << ": " << endl;
                                         labelsStack.push(labels++);
                                 }
         ;
 
 forLoop:
         FOR {symTable = new SymbolTable(symTable); forInit = true;} '(' initialization ';'      {
-                                                quadFile << endl << "Label" << labels << ": " << endl;
+                                                quadFile << endl << "&Label" << labels << ": " << endl;
                                                 labelsStack.push(labels++);
                                         }
         ;
@@ -229,7 +229,7 @@ ifCondition:
         ;
 
 endBracketJump:
-        ')' { quadFile << "JZ OutLabel" << labelsStack.top() << endl; }
+        ')' { quadFile << "JZ &OutLabel" << labelsStack.top() << endl; }
         ;
 
 endCaseExpression:
@@ -237,7 +237,7 @@ endCaseExpression:
         ;
 
 semicolonJump:
-        ';' { quadFile << "JZ OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
+        ';' { quadFile << "JZ &OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
         ;
 
 endForDeclaration:
@@ -245,7 +245,7 @@ endForDeclaration:
         ;
 
 elseLabel:
-        ELSE { quadFile << "JMP OutLabel" << labels << '\n' << "OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); labelsStack.push(labels++); }
+        ELSE { quadFile << "JMP &OutLabel" << labels << '\n' << "&OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); labelsStack.push(labels++); }
         ;
 
 funcDeclaration:
@@ -324,14 +324,14 @@ caseExpression:
 
 caseColon:
         ':'                     {   
-                                        quadFile << "PUSH $t" << labelsStack.top() << endl << "EQ" << endl << "JZ label" << labels << endl; 
+                                        quadFile << "PUSH $t" << labelsStack.top() << endl << "EQ" << endl << "JZ &label" << labels << endl;
                                         labelsStack.push(labels++); 
                                 }
         ;
 
 caseScope:
         scope                   { 
-                                        quadFile << "JMP OutLabel" << switchStack.top() << endl << "label" << labelsStack.top() << ":" << endl;
+                                        quadFile << "JMP &OutLabel" << switchStack.top() << endl << "&label" << labelsStack.top() << ":" << endl;
                                         labelsStack.pop();
                                 }
         ;
