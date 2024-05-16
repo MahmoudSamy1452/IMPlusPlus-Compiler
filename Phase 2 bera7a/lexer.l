@@ -39,7 +39,7 @@
                           return BOOLEAN;
                         }
 
-[-+/*(){}.=;&|~><?:,]   {
+[-+/*(){}=;&|~><:,]   {
                           yylval.string = strdup(yytext);
                           return *yytext;
                         }
