@@ -124,7 +124,7 @@ assignmentValue:
                                             throwError("function " + string($1) + " argument size mismatch\n");
                                         }
                                         quadFile << "CALL " << $1 << endl; 
-                                        $$ = new Value{nullptr, *symTable->lookup($1)->returnType};
+                                        $$ = new Value{new int(1), *symTable->lookup($1)->returnType};
                                 }
         ;
 
