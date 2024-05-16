@@ -3,20 +3,21 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/monokai.css';
 import 'codemirror/mode/clike/clike'; // mode for C/C++/Java-like languages
 
-const Editor = ({title, readOnly, codemirrorRef}) => {
+
+
+const Editor = ({codemirrorRef}) => {
 
   return (
-    <div className='flex flex-col justify-center w-full max-h-[50vh] p-10'>
-      <h2 className='mt-5 text-2xl text-white font-bold text-center'>{title}</h2>
+    <div id='myClass' className='flex flex-col w-full h-full px-6 py-1'>
       <CodeMirror
         ref={codemirrorRef}
-        className='w-full mt-5 bg-[#272822] text-white rounded-lg'
+        className='w-full overflow-x-hidden mt-2 bg-[#272822] text-white rounded-lg'
         options={{
           lineNumbers: true,
           theme: 'monokai',
           mode: 'text/x-csrc',
-          readOnly: readOnly,
         }}
+        
       />
     </div>
   );

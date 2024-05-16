@@ -3,3 +3,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.CodeMirror-gutter{
+    background: #171717!important;
+}
+
+.CodeMirror {
+    background: #171717!important;
+    max-height: 377px!important;
+    min-height: 100%!important;
+}
+
+.react-codemirror2{
+    height: 100%!important;
+}
+
+#myClass .CodeMirror {
+    background-image: url(./assets/out.png) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 15% !important;
+    filter: brightness(75%);
+
+}
+.transition-x {
+    transition: transform 300ms ease-in-out;
+}
