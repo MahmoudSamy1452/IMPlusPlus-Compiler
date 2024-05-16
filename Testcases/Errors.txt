@@ -1,0 +1,34 @@
+int x = 10;
+{
+  int y = 20;
+};
+x = y; // y is not defined in this scope
+
+int s = "string"; // type mismatch
+
+const int y = 10;
+y = 20; // assigning to const variable
+
+ret 10; // return outside function
+
+function int main(){
+  //missing return statement
+};
+
+main(1); // extra argument passed
+
+function int main(int x){
+};
+
+function int max(int a, int b){
+  if(a > b) then {
+    ret a;
+  } else { ret b; };
+};
+max("a", 1); // expecting an int but got a string
+
+function void v(){
+  ret 1; //returning int inside a void function
+};
+
+string w = v(); // assigning void to string
