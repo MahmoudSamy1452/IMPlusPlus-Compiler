@@ -7,7 +7,8 @@ enum Type
     TYPE_CHAR,
     TYPE_CHAR_ARRAY,
     TYPE_VOID,
-    TYPE_FUNC
+    TYPE_FUNC,
+    TYPE_ERROR
 };
 
 enum OP
