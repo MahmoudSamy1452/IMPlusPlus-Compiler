@@ -304,18 +304,18 @@ caseExpression:
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                                 quadFile << "PUSH " << $1 << endl;
                                         }
-        | caseExpression '<' caseExpression     { implementOperation(OP::LeT, forCount,&forStack, $1->type, $3->type);  $$ = $1;}
-        | caseExpression '>' caseExpression     { implementOperation(OP::GrT, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression LE caseExpression      { implementOperation(OP::LeE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression GE caseExpression      { implementOperation(OP::GrE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression EQ caseExpression      { implementOperation(OP::EQQ, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression NE caseExpression      { implementOperation(OP::NoE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression '|' caseExpression     { implementOperation(OP::OR, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression '&' caseExpression     { implementOperation(OP::AND, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression '+' caseExpression     { implementOperation(OP::PLUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression '-' caseExpression     { implementOperation(OP::MINUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression '*' caseExpression     { implementOperation(OP::MULTIPLY, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | caseExpression '/' caseExpression     { implementOperation(OP::DIVIDE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | caseExpression '<' caseExpression     { implementOperation(OP::LeT, forCount,&forStack, $1->type, $3->type);  $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '>' caseExpression     { implementOperation(OP::GrT, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression LE caseExpression      { implementOperation(OP::LeE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression GE caseExpression      { implementOperation(OP::GrE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression EQ caseExpression      { implementOperation(OP::EQQ, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression NE caseExpression      { implementOperation(OP::NoE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '|' caseExpression     { implementOperation(OP::OR, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '&' caseExpression     { implementOperation(OP::AND, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '+' caseExpression     { implementOperation(OP::PLUS, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '-' caseExpression     { implementOperation(OP::MINUS, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '*' caseExpression     { implementOperation(OP::MULTIPLY, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | caseExpression '/' caseExpression     { implementOperation(OP::DIVIDE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
         | '~' caseExpression                { implementOperation(OP::NOT, forCount,&forStack, $2->type, $2->type); $$ = $2;}
         | '-' caseExpression                { implementOperation(OP::NEG, forCount,&forStack, $2->type, $2->type); $$ = $2;}
         | '(' caseExpression ')'            { $$ = $2;}    
@@ -361,18 +361,18 @@ expression:
                                                         quadFile << "PUSH " << $1 << endl;
                                                 $$ = new Value{symTable->getValue($1), symTable->getType($1)};
                                         }
-        | expression '<' expression     { implementOperation(OP::LeT, forCount, &forStack, $1->type, $3->type);  $$ = $1; /* TODO: check on type and propagate*/}
-        | expression '>' expression     { implementOperation(OP::GrT, forCount, &forStack, $1->type, $3->type); $$ = $1;}
-        | expression LE expression      { implementOperation(OP::LeE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression GE expression      { implementOperation(OP::GrE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression NE expression      { implementOperation(OP::NoE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression '|' expression     { implementOperation(OP::OR, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression '&' expression     { implementOperation(OP::AND, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forStack, $1->type, $3->type); $$ = $1;}
-        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forStack, $1->type, $3->type); $$ = $1;}
+        | expression '<' expression     { implementOperation(OP::LeT, forCount, &forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1; /* TODO: check on type and propagate*/}
+        | expression '>' expression     { implementOperation(OP::GrT, forCount, &forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression LE expression      { implementOperation(OP::LeE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression GE expression      { implementOperation(OP::GrE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression EQ expression      { implementOperation(OP::EQQ, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression NE expression      { implementOperation(OP::NoE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression '|' expression     { implementOperation(OP::OR, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression '&' expression     { implementOperation(OP::AND, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression '+' expression     { implementOperation(OP::PLUS, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression '-' expression     { implementOperation(OP::MINUS, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression '*' expression     { implementOperation(OP::MULTIPLY, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
+        | expression '/' expression     { implementOperation(OP::DIVIDE, forCount,&forStack, $1->type, $3->type); $$ = $1->type < $3->type?  $3: $1;}
         | '~' expression                { implementOperation(OP::NOT, forCount,&forStack, $2->type, $2->type); $$ = $2;}
         | '-' expression                { implementOperation(OP::NEG, forCount,&forStack, $2->type, $2->type); $$ = $2;}
         | '(' expression ')'            { $$ = $2;}

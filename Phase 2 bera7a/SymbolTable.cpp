@@ -2,6 +2,7 @@
 #include "enums.h"
 
 extern void throwError(string msg);
+extern ofstream quadFile;
 
 SymbolTable::SymbolTable(SymbolTable *parent) {
     this->parent = parent;
@@ -101,8 +102,10 @@ void SymbolTable::setValue(string name, Value *val) {
     if (entry->isConst) {
         throwError("Cannot assign to const variable");
     }
-    
-    if (entry->type != val->type && val->type != Type::TYPE_ERROR) {
+    if (entry->type != val->type && entry->type <= Type::TYPE_FLOAT && val->type <= Type::TYPE_FLOAT) {
+        quadFile << "CAST " << enumTypeToString(entry->type) << endl;
+    }
+    else if (entry->type != val->type && val->type != Type::TYPE_ERROR) {
         throwError("Type mismatch");
     }
     if(val->type == Type::TYPE_ERROR)
