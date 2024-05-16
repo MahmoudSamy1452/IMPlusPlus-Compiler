@@ -39,6 +39,7 @@ public:
 
   void setValue(string name, Value *val);
 
+  string *getCurrentFunctionName();
   string *getFunctionName();
   void setFunctionName(string *name);
 
