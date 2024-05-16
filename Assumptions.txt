@@ -1,0 +1,5 @@
+expression does not support function call + operations
+can perform operations on any pair of bool, int and float by casting
+allowed casting types: bool, int, float
+once matched a case automatically break at end
+void function must return

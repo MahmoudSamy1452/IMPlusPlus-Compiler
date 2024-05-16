@@ -1,41 +1,9 @@
-Mahmoud:
-POP z
-POP y
-PUSH y
-POP x
-PUSH 10
-POP n
-PUSH 0
-POP i
-
-Label0: 
-PUSH i
-PUSH n
-LT 
-JZ OutLabel0
-PUSH x
-PUSH 1
-ADD 
-POP x
-PUSH i
-PUSH 1
-ADD
-POP i
-JMP Label0
-OutLabel0: 
-
-PUSH z
-POP $retvalue
-RET $retvalue
-PUSH 1
-PUSH "Moaaz"
-CALL Mahmoud
-POP G
-PUSH "Moaaz"
+PUSH 2
 POP x
 PUSH x
-POP y
 PUSH 1
-POP z
-PUSH 1
-POP q
+EQ 
+JZ &OutLabel0
+PUSH 2
+POP x
+&OutLabel0:

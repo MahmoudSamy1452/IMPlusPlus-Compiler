@@ -1,4 +1,0 @@
-Error at line 13: Variable q is declared but not used
-Error at line 13: Variable y is declared but not used
-Error at line 13: Variable z is declared but not used
-Error at line 13: Variable G is declared but not used
