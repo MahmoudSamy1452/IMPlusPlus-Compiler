@@ -1,7 +1,7 @@
 int x = 10;
 {
   int y = 20;
-};
+}; // Variable y is declared but not used
 x = y; // y is not defined in this scope
 
 int s = "string"; // type mismatch
@@ -17,8 +17,9 @@ function int main(){
 
 main(1); // extra argument passed
 
-function int main(int x){
-};
+function int main(int x){ // main already defined in this scope
+  ret 1.1;
+}; // Variable x is declared but not used
 
 function int max(int a, int b){
   if(a > b) then {
@@ -32,3 +33,8 @@ function void v(){
 };
 
 string w = v(); // assigning void to string
+
+// Variable w is declared but not used
+// Variable y is declared but not used
+// Variable s is declared but not used
+// Variable x is declared but not used

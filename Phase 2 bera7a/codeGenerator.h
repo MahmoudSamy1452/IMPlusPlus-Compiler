@@ -58,19 +58,20 @@ void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1
         throwError("Invalid operation on string");
     }
     
-    if (type1 > type2)
-    {
-        quadFile << "CAST " << enumTypeToString(type1) << " " << endl;
-    }
-    else if (type1 < type2)
-    {
-        quadFile << "POP $R1" << endl;
-        quadFile << "CAST " << enumTypeToString(type2) << " " << endl;
-        quadFile << "PUSH $R1" << endl;
-    }
+    
 
     if (forCount > 0)
     {
+        if (type1 > type2)
+        {
+            forStack->push("CAST " + enumTypeToString(type1));
+        }
+        else if (type1 < type2)
+        {
+            forStack->push("POP $R1");
+            forStack->push("CAST " + enumTypeToString(type2));
+            forStack->push("PUSH $R1");
+        }
         switch (op)
         {
         case OP::PLUS:
@@ -121,6 +122,16 @@ void implementOperation(OP op, int forCount, stack<string> *forStack, Type type1
     }
     else
     {
+        if (type1 > type2)
+        {
+            quadFile << "CAST " << enumTypeToString(type1) << " " << endl;
+        }
+        else if (type1 < type2)
+        {
+            quadFile << "POP $R1" << endl;
+            quadFile << "CAST " << enumTypeToString(type2) << " " << endl;
+            quadFile << "PUSH $R1" << endl;
+        }
         switch (op)
         {
         case OP::PLUS:

@@ -183,13 +183,17 @@ statement:
                                         quadFile << "CALL " << $1 << endl; 
                                 }
         | RETURN assignmentValue {
-                                    quadFile << "POP " << "$retvalue" << endl;
-                                    quadFile << "RET " << "$retvalue" << endl;
+
                                     if(symTable->getCurrentFunctionName() == nullptr) {
                                         throwError("return statement outside function\n");
                                     }
+                                    else if (*symTable->getReturnType(*symTable->getCurrentFunctionName()) != $2->type && *symTable->getReturnType(*symTable->getCurrentFunctionName()) <= Type::TYPE_FLOAT && $2->type <= Type::TYPE_FLOAT) {
+                                            quadFile << "CAST " << enumTypeToString(*symTable->getReturnType(*symTable->getCurrentFunctionName())) << endl;
+                                    }
                                     else if(*symTable->getReturnType(*symTable->getCurrentFunctionName()) != $2->type) {throwError("return type mismatch\n");}
                                     symTable->setIsReturned();
+                                    quadFile << "POP " << "$retvalue" << endl;
+                                    quadFile << "RET " << "$retvalue" << endl;
                                  }
         | RETURN                {
                                     quadFile << "RET" << endl;
