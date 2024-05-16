@@ -1,0 +1,13 @@
+int x = 0;
+int y;
+y = 10;
+int w = 0;
+int z = w - x / y;
+y = x + z;
+float f = 1.1;
+f = f + x;
+char ch = 'c';
+string s = "string";
+bool a = True;
+bool b = False;
+bool c = a & b;

@@ -1,0 +1,19 @@
+int x = 0;
+bool y = True;
+int ans = 1;
+if(x == 0) then {
+	ans  = ans + 1;
+} else {
+  if(x == 2) then { 
+	ans = ans + 1;
+  };
+};
+
+switch(x){
+  case 1:{
+  	x = 2;
+  }
+  case 2:{
+  	y = False;
+  }
+};
