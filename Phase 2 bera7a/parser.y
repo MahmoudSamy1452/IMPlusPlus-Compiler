@@ -25,6 +25,8 @@
     std::stack<string> forStack;
     std::stack<int> switchStack;
 
+    bool forInit = false;
+
     string* currentFunction = nullptr;
 
     extern int yylineno;
@@ -214,7 +216,7 @@ repeatLoop:
         ;
 
 forLoop:
-        FOR '(' initialization ';'      {
+        FOR {symTable = new SymbolTable(symTable); forInit = true;} '(' initialization ';'      {
                                                 quadFile << endl << "Label" << labels << ": " << endl;
                                                 labelsStack.push(labels++);
                                         }
@@ -400,21 +402,20 @@ scope:
 scopeInit:
         '{'     {
                         symbolTable << "{" << endl;
-                        symTable = new SymbolTable(symTable);
-                        if(currentFunction != nullptr) {
-                                symTable->setFunctionName(currentFunction);
-                                auto args = symTable->lookup(*currentFunction)->args;
-                                for(auto arg : *args) {
-                                       symTable->insert(arg.second, arg.first);
-                                       symTable->setValue(arg.second, new Value{(void*)1, arg.first});
-                                }
-                                currentFunction = nullptr;
+                        if(!forInit) {
+                            symTable = new SymbolTable(symTable);
+                            if(currentFunction != nullptr) {
+                                    symTable->setFunctionName(currentFunction);
+                                    auto args = symTable->lookup(*currentFunction)->args;
+                                    for(auto arg : *args) {
+                                           symTable->insert(arg.second, arg.first);
+                                           symTable->setValue(arg.second, new Value{(void*)1, arg.first});
+                                    }
+                                    currentFunction = nullptr;
+                            }
+
                         }
-                        if(forInit) {
-                                symTable->insert(forInitPair.first.first, forInitPair.first.second, forInitPair.second.first, forInitPair.second.second);
-                                forInit = false;
-                                forInitPair = make_pair(make_pair("", Type::TYPE_INT), make_pair(nullptr, false));
-                        }
+                        forInit = false;
                 }
         ;
 
