@@ -185,18 +185,18 @@ statement:
         | RETURN assignmentValue {
                                     quadFile << "POP " << "$retvalue" << endl;
                                     quadFile << "RET " << "$retvalue" << endl;
-                                    if(symTable->getFunctionName() == nullptr) {
+                                    if(symTable->getCurrentFunctionName() == nullptr) {
                                         throwError("return statement outside function\n");
                                     }
-                                    else if(*symTable->getReturnType(*symTable->getFunctionName()) != $2->type) {throwError("return type mismatch\n");}
+                                    else if(*symTable->getReturnType(*symTable->getCurrentFunctionName()) != $2->type) {throwError("return type mismatch\n");}
                                     symTable->setIsReturned();
                                  }
         | RETURN                {
                                     quadFile << "RET" << endl;
-                                    if(symTable->getFunctionName() == nullptr) {
+                                    if(symTable->getCurrentFunctionName() == nullptr) {
                                         throwError("return statement outside function\n");
                                     }
-                                    else if(*symTable->getReturnType(*symTable->getFunctionName()) != Type::TYPE_VOID) {throwError("return type mismatch\n");}
+                                    else if(*symTable->getReturnType(*symTable->getCurrentFunctionName()) != Type::TYPE_VOID) {throwError("return type mismatch\n");}
                                     symTable->setIsReturned();
                                  }
         ;

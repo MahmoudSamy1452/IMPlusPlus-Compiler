@@ -1,0 +1,11 @@
+function int fibb(int x) {
+  if(x <= 1) then {
+    ret x;
+  };
+
+  int z = fibb(x - 1);
+  int c = fibb(x - 2);
+  ret z + c;
+};
+
+fibb(5);

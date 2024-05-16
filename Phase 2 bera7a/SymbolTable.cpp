@@ -11,12 +11,17 @@ void SymbolTable::setFunctionName(string *name) {
     this->functionName = name;
 }
 
-string *SymbolTable::getFunctionName()
+string *SymbolTable::getCurrentFunctionName()
 {
     if (this->parent == nullptr && this->functionName == nullptr)
         return nullptr;
     if (this->functionName == nullptr)
         return this->parent->getFunctionName();
+    return this->functionName;
+}
+
+string *SymbolTable::getFunctionName()
+{
     return this->functionName;
 }
 
