@@ -35,7 +35,7 @@
 /* "%code requires" blocks.  */
 
 /* Line 1676 of yacc.c  */
-#line 1 ".\\parser.y"
+#line 1 "./parser.y"
 
     #include "SymbolTable.h"
     #include "structs.h"
@@ -125,7 +125,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 42 ".\\parser.y"
+#line 42 "./parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */

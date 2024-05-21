@@ -68,7 +68,7 @@
 /* Copy the first part of user declarations.  */
 
 /* Line 189 of yacc.c  */
-#line 12 ".\\parser.y"
+#line 12 "./parser.y"
 
     #include <stdio.h>
     #include "structs.h"
@@ -123,7 +123,7 @@
 /* "%code requires" blocks.  */
 
 /* Line 209 of yacc.c  */
-#line 1 ".\\parser.y"
+#line 1 "./parser.y"
 
     #include "SymbolTable.h"
     #include "structs.h"
@@ -213,7 +213,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 42 ".\\parser.y"
+#line 42 "./parser.y"
 
     float value;                /* float value */
     char* string;               /* string value */
@@ -1632,14 +1632,14 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 68 ".\\parser.y"
+#line 68 "./parser.y"
     { symbolTable << "{" << endl;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 68 ".\\parser.y"
+#line 68 "./parser.y"
     {
                 symTable->checkUnusedVariables(); 
                 symTable->printTable(); symbolTable << "}" << endl;}
@@ -1648,14 +1648,14 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 71 ".\\parser.y"
+#line 71 "./parser.y"
     { throwError("Syntax Error"); YYABORT; }
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 81 ".\\parser.y"
+#line 81 "./parser.y"
     {
                                                                 symTable->insert((yyvsp[(2) - (2)].string), (yyvsp[(1) - (2)].type));
                                                         }
@@ -1664,7 +1664,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 84 ".\\parser.y"
+#line 84 "./parser.y"
     {
 
                                                                 symTable->insert((yyvsp[(2) - (4)].string), (yyvsp[(1) - (4)].type), (yyvsp[(4) - (4)].val)->value);
@@ -1679,7 +1679,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 93 ".\\parser.y"
+#line 93 "./parser.y"
     {       symTable->insert((yyvsp[(3) - (5)].string), (yyvsp[(2) - (5)].type), (yyvsp[(5) - (5)].val)->value, true);
                                                                 if(forCount > 0)
                                                                         forStack.push("POP " + (string)(yyvsp[(3) - (5)].string));
@@ -1691,7 +1691,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 103 ".\\parser.y"
+#line 103 "./parser.y"
     { symTable->setValue((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].val));
                                                           if(forCount > 0){
                                                                 forStack.push("POP " + (string)(yyvsp[(1) - (3)].string));
@@ -1704,21 +1704,21 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 113 ".\\parser.y"
+#line 113 "./parser.y"
     { quadFile << "PUSH " << (string)reinterpret_cast<char*>((yyvsp[(1) - (1)].val)->value) << endl; (yyval.val) = (yyvsp[(1) - (1)].val); }
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 114 ".\\parser.y"
+#line 114 "./parser.y"
     { quadFile << "PUSH " << (string)reinterpret_cast<char*>((yyvsp[(1) - (1)].val)->value) << endl; (yyval.val) = (yyvsp[(1) - (1)].val); }
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 116 ".\\parser.y"
+#line 116 "./parser.y"
     {
                                         if(symTable->lookup((yyvsp[(1) - (4)].string)) == nullptr) {
                                             throwError("function " + string((yyvsp[(1) - (4)].string)) + " not declared\n");
@@ -1737,7 +1737,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 138 ".\\parser.y"
+#line 138 "./parser.y"
     { 
                                                                                 quadFile << "JMP &Label" << labelsStack.top() << endl << "&OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
@@ -1747,7 +1747,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 142 ".\\parser.y"
+#line 142 "./parser.y"
     { 
                                                                                 quadFile << "JZ &Label" << labelsStack.top() << endl << "&OutLabel" << labelsStack.top() << ": " << endl << endl;
                                                                                 labelsStack.pop();
@@ -1757,7 +1757,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 146 ".\\parser.y"
+#line 146 "./parser.y"
     {
                                                                                 stack<string> tempStack;
                                                                                 while (forStack.top() != "@"){
@@ -1777,28 +1777,28 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 160 ".\\parser.y"
+#line 160 "./parser.y"
     { quadFile << "&OutLabel" << switchStack.top() << ":" << endl; switchStack.pop(); labelsStack.pop(); }
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 162 ".\\parser.y"
+#line 162 "./parser.y"
     { quadFile << "&OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 163 ".\\parser.y"
+#line 163 "./parser.y"
     { quadFile << "&OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); }
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 165 ".\\parser.y"
+#line 165 "./parser.y"
     {
                                         if(symTable->lookup((yyvsp[(1) - (4)].string)) == nullptr) {
                                             throwError("function " + string((yyvsp[(1) - (4)].string)) + " not declared\n");
@@ -1824,7 +1824,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 185 ".\\parser.y"
+#line 185 "./parser.y"
     {
 
                                     if(symTable->getCurrentFunctionName() == nullptr) {
@@ -1843,7 +1843,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 198 ".\\parser.y"
+#line 198 "./parser.y"
     {
                                     quadFile << "RET" << endl;
                                     if(symTable->getCurrentFunctionName() == nullptr) {
@@ -1857,7 +1857,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 209 ".\\parser.y"
+#line 209 "./parser.y"
     { 
                                         quadFile << endl << "&Label" << labels << ": " << endl;
                                         labelsStack.push(labels++);
@@ -1867,7 +1867,7 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 216 ".\\parser.y"
+#line 216 "./parser.y"
     { 
                                         quadFile << endl << "&Label" << labels << ": " << endl;
                                         labelsStack.push(labels++);
@@ -1877,14 +1877,14 @@ yyreduce:
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 223 ".\\parser.y"
+#line 223 "./parser.y"
     {symTable = new SymbolTable(symTable); forInit = true;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 223 ".\\parser.y"
+#line 223 "./parser.y"
     {
                                                 quadFile << endl << "&Label" << labels << ": " << endl;
                                                 labelsStack.push(labels++);
@@ -1894,7 +1894,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 230 ".\\parser.y"
+#line 230 "./parser.y"
     { 
                                                 labelsStack.push(labels++); 
                                         }
@@ -1903,98 +1903,98 @@ yyreduce:
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 236 ".\\parser.y"
+#line 236 "./parser.y"
     { quadFile << "JZ &OutLabel" << labelsStack.top() << endl; }
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 240 ".\\parser.y"
+#line 240 "./parser.y"
     { quadFile << "POP $t" << labels << endl; labelsStack.push(labels++); switchStack.push(labels++); }
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 244 ".\\parser.y"
+#line 244 "./parser.y"
     { quadFile << "JZ &OutLabel" << labelsStack.top() << endl; forCount++; forStack.push("@"); }
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 248 ".\\parser.y"
+#line 248 "./parser.y"
     { forCount--; }
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 252 ".\\parser.y"
+#line 252 "./parser.y"
     { quadFile << "JMP &OutLabel" << labels << '\n' << "&OutLabel" << labelsStack.top() << ":" << endl; labelsStack.pop(); labelsStack.push(labels++); }
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 260 ".\\parser.y"
+#line 260 "./parser.y"
     { quadFile << (yyvsp[(3) - (3)].string) << ':' << endl; symTable->insert((yyvsp[(3) - (3)].string), Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type((yyvsp[(2) - (3)].type))); currentFunction = new string((yyvsp[(3) - (3)].string));}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 261 ".\\parser.y"
+#line 261 "./parser.y"
     { quadFile << (yyvsp[(3) - (3)].string) << ':' << endl; symTable->insert((yyvsp[(3) - (3)].string), Type::TYPE_FUNC, nullptr, false, new vector<pair<Type, string>>(), new Type(Type::TYPE_VOID)); currentFunction = new string((yyvsp[(3) - (3)].string));}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 265 ".\\parser.y"
+#line 265 "./parser.y"
     { quadFile << "POP " << (yyvsp[(2) - (2)].string) << endl; symTable->addArgs(*currentFunction, (yyvsp[(2) - (2)].string), (yyvsp[(1) - (2)].type)); }
     break;
 
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 266 ".\\parser.y"
+#line 266 "./parser.y"
     { quadFile << "POP " << (yyvsp[(2) - (4)].string) << endl; symTable->addArgs(*currentFunction, (yyvsp[(2) - (4)].string), (yyvsp[(1) - (4)].type));}
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 275 ".\\parser.y"
+#line 275 "./parser.y"
     {(yyvsp[(3) - (3)].types)->push((yyvsp[(1) - (3)].val)->type); (yyval.types) = (yyvsp[(3) - (3)].types);}
     break;
 
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 276 ".\\parser.y"
+#line 276 "./parser.y"
     {(yyval.types) = new queue<Type>(); (yyval.types)->push((yyvsp[(1) - (1)].val)->type);}
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 280 ".\\parser.y"
+#line 280 "./parser.y"
     {(yyval.types) = (yyvsp[(1) - (1)].types);}
     break;
 
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 281 ".\\parser.y"
+#line 281 "./parser.y"
     {(yyval.types) = new queue<Type>();}
     break;
 
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 295 ".\\parser.y"
+#line 295 "./parser.y"
     {  
                                                 (yyval.val) = (yyvsp[(1) - (1)].val);
                                                 quadFile << "PUSH " << *(int*)(yyvsp[(1) - (1)].val)->value << endl;
@@ -2004,7 +2004,7 @@ yyreduce:
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 299 ".\\parser.y"
+#line 299 "./parser.y"
     { 
                                                 (yyval.val) = (yyvsp[(1) - (1)].val);
                                                 quadFile << "PUSH " << *(bool*)(yyvsp[(1) - (1)].val)->value << endl ;
@@ -2014,7 +2014,7 @@ yyreduce:
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 303 ".\\parser.y"
+#line 303 "./parser.y"
     { 
                                                 (yyval.val) = (yyvsp[(1) - (1)].val);
                                                 quadFile << "PUSH " << (string)reinterpret_cast<char*>((yyvsp[(1) - (1)].val)->value) << endl;
@@ -2024,7 +2024,7 @@ yyreduce:
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 307 ".\\parser.y"
+#line 307 "./parser.y"
     { 
                                                 (yyval.val) = new Value{symTable->getValue((yyvsp[(1) - (1)].string)), symTable->getType((yyvsp[(1) - (1)].string))};
                                                 quadFile << "PUSH " << (yyvsp[(1) - (1)].string) << endl;
@@ -2034,112 +2034,112 @@ yyreduce:
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 311 ".\\parser.y"
+#line 311 "./parser.y"
     { implementOperation(OP::LeT, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type);  (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 312 ".\\parser.y"
+#line 312 "./parser.y"
     { implementOperation(OP::GrT, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 313 ".\\parser.y"
+#line 313 "./parser.y"
     { implementOperation(OP::LeE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 314 ".\\parser.y"
+#line 314 "./parser.y"
     { implementOperation(OP::GrE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 315 ".\\parser.y"
+#line 315 "./parser.y"
     { implementOperation(OP::EQQ, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 316 ".\\parser.y"
+#line 316 "./parser.y"
     { implementOperation(OP::NoE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 317 ".\\parser.y"
+#line 317 "./parser.y"
     { implementOperation(OP::OR, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 318 ".\\parser.y"
+#line 318 "./parser.y"
     { implementOperation(OP::AND, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 319 ".\\parser.y"
+#line 319 "./parser.y"
     { implementOperation(OP::PLUS, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 320 ".\\parser.y"
+#line 320 "./parser.y"
     { implementOperation(OP::MINUS, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 321 ".\\parser.y"
+#line 321 "./parser.y"
     { implementOperation(OP::MULTIPLY, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 322 ".\\parser.y"
+#line 322 "./parser.y"
     { implementOperation(OP::DIVIDE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 323 ".\\parser.y"
+#line 323 "./parser.y"
     { implementOperation(OP::NOT, forCount,&forStack, (yyvsp[(2) - (2)].val)->type, (yyvsp[(2) - (2)].val)->type); (yyval.val) = (yyvsp[(2) - (2)].val);}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 324 ".\\parser.y"
+#line 324 "./parser.y"
     { implementOperation(OP::NEG, forCount,&forStack, (yyvsp[(2) - (2)].val)->type, (yyvsp[(2) - (2)].val)->type); (yyval.val) = (yyvsp[(2) - (2)].val);}
     break;
 
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 325 ".\\parser.y"
+#line 325 "./parser.y"
     { (yyval.val) = (yyvsp[(2) - (3)].val);}
     break;
 
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 329 ".\\parser.y"
+#line 329 "./parser.y"
     {   
                                         quadFile << "PUSH $t" << labelsStack.top() << endl << "EQ" << endl << "JZ &label" << labels << endl;
                                         labelsStack.push(labels++); 
@@ -2149,7 +2149,7 @@ yyreduce:
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 336 ".\\parser.y"
+#line 336 "./parser.y"
     { 
                                         quadFile << "JMP &OutLabel" << switchStack.top() << endl << "&label" << labelsStack.top() << ":" << endl;
                                         labelsStack.pop();
@@ -2159,7 +2159,7 @@ yyreduce:
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 343 ".\\parser.y"
+#line 343 "./parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val);
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(double*)(yyvsp[(1) - (1)].val)->value));
@@ -2171,7 +2171,7 @@ yyreduce:
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 349 ".\\parser.y"
+#line 349 "./parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val);
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(int*)(yyvsp[(1) - (1)].val)->value));
@@ -2183,7 +2183,7 @@ yyreduce:
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 355 ".\\parser.y"
+#line 355 "./parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val);
                                             if(forCount > 0)
                                                 forStack.push("PUSH " + std::to_string(*(bool*)(yyvsp[(1) - (1)].val)->value));
@@ -2195,7 +2195,7 @@ yyreduce:
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 361 ".\\parser.y"
+#line 361 "./parser.y"
     { 
                                                 if(forCount > 0)
                                                         forStack.push("PUSH " + (string)(yyvsp[(1) - (1)].string));
@@ -2208,147 +2208,147 @@ yyreduce:
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 368 ".\\parser.y"
+#line 368 "./parser.y"
     { implementOperation(OP::LeT, forCount, &forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val); /* TODO: check on type and propagate*/}
     break;
 
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 369 ".\\parser.y"
+#line 369 "./parser.y"
     { implementOperation(OP::GrT, forCount, &forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 370 ".\\parser.y"
+#line 370 "./parser.y"
     { implementOperation(OP::LeE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 371 ".\\parser.y"
+#line 371 "./parser.y"
     { implementOperation(OP::GrE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 372 ".\\parser.y"
+#line 372 "./parser.y"
     { implementOperation(OP::EQQ, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 373 ".\\parser.y"
+#line 373 "./parser.y"
     { implementOperation(OP::NoE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 374 ".\\parser.y"
+#line 374 "./parser.y"
     { implementOperation(OP::OR, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 375 ".\\parser.y"
+#line 375 "./parser.y"
     { implementOperation(OP::AND, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 376 ".\\parser.y"
+#line 376 "./parser.y"
     { implementOperation(OP::PLUS, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 377 ".\\parser.y"
+#line 377 "./parser.y"
     { implementOperation(OP::MINUS, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 378 ".\\parser.y"
+#line 378 "./parser.y"
     { implementOperation(OP::MULTIPLY, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 379 ".\\parser.y"
+#line 379 "./parser.y"
     { implementOperation(OP::DIVIDE, forCount,&forStack, (yyvsp[(1) - (3)].val)->type, (yyvsp[(3) - (3)].val)->type); (yyval.val) = (yyvsp[(1) - (3)].val)->type < (yyvsp[(3) - (3)].val)->type?  (yyvsp[(3) - (3)].val): (yyvsp[(1) - (3)].val);}
     break;
 
   case 90:
 
 /* Line 1455 of yacc.c  */
-#line 380 ".\\parser.y"
+#line 380 "./parser.y"
     { implementOperation(OP::NOT, forCount,&forStack, (yyvsp[(2) - (2)].val)->type, (yyvsp[(2) - (2)].val)->type); (yyval.val) = (yyvsp[(2) - (2)].val);}
     break;
 
   case 91:
 
 /* Line 1455 of yacc.c  */
-#line 381 ".\\parser.y"
+#line 381 "./parser.y"
     { implementOperation(OP::NEG, forCount,&forStack, (yyvsp[(2) - (2)].val)->type, (yyvsp[(2) - (2)].val)->type); (yyval.val) = (yyvsp[(2) - (2)].val);}
     break;
 
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 382 ".\\parser.y"
+#line 382 "./parser.y"
     { (yyval.val) = (yyvsp[(2) - (3)].val);}
     break;
 
   case 93:
 
 /* Line 1455 of yacc.c  */
-#line 385 ".\\parser.y"
+#line 385 "./parser.y"
     { (yyval.type) = Type::TYPE_INT; }
     break;
 
   case 94:
 
 /* Line 1455 of yacc.c  */
-#line 386 ".\\parser.y"
+#line 386 "./parser.y"
     { (yyval.type) = Type::TYPE_FLOAT; }
     break;
 
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 387 ".\\parser.y"
+#line 387 "./parser.y"
     { (yyval.type) = Type::TYPE_BOOL; }
     break;
 
   case 96:
 
 /* Line 1455 of yacc.c  */
-#line 388 ".\\parser.y"
+#line 388 "./parser.y"
     { (yyval.type) = Type::TYPE_CHAR; }
     break;
 
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 389 ".\\parser.y"
+#line 389 "./parser.y"
     { (yyval.type) = Type::TYPE_CHAR_ARRAY; }
     break;
 
   case 98:
 
 /* Line 1455 of yacc.c  */
-#line 393 ".\\parser.y"
+#line 393 "./parser.y"
     {
                                 if(symTable->getFunctionName() != nullptr && symTable->getIsReturned() == false) {
                                         throwError("Function " + *symTable->getFunctionName() + " is missing a return statement\n");
@@ -2363,7 +2363,7 @@ yyreduce:
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 405 ".\\parser.y"
+#line 405 "./parser.y"
     {
                         symbolTable << "{" << endl;
                         if(!forInit) {
@@ -2598,7 +2598,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 441 ".\\parser.y"
+#line 441 "./parser.y"
 
 
 void yyerror(const char *s) {

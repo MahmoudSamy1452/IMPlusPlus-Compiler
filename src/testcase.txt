@@ -1,0 +1,5 @@
+int x = 0;
+int y;
+y = 10;
+int w = 0;
+int z = w - x / y;

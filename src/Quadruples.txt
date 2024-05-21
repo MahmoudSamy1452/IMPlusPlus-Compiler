@@ -1,0 +1,12 @@
+PUSH 0
+POP x
+PUSH 10
+POP y
+PUSH 0
+POP w
+PUSH w
+PUSH x
+PUSH y
+DIV 
+SUB 
+POP z

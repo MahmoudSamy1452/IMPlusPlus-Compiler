@@ -1,7 +1,14 @@
 {
 {
+{
 name                Type                isConst             returnType          isUsed              
 }
 name                Type                isConst             returnType          isUsed              
+c                   int                 0                   N/A                 1                   
 x                   int                 0                   N/A                 1                   
+z                   int                 0                   N/A                 1                   
+}
+name                Type                isConst             returnType          isUsed              
+ans                 int                 1                   N/A                 0                   
+fibb                function            0                   int                 0                   
 }

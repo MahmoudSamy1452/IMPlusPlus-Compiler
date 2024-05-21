@@ -1,9 +1,30 @@
-PUSH 2
+fibb:
 POP x
 PUSH x
 PUSH 1
-EQ 
+LE 
 JZ &OutLabel0
-PUSH 2
-POP x
+PUSH x
+POP $retvalue
+RET $retvalue
 &OutLabel0:
+PUSH x
+PUSH 1
+SUB 
+CALL fibb
+POP z
+PUSH x
+PUSH 2
+SUB 
+CALL fibb
+POP c
+PUSH z
+PUSH c
+ADD 
+POP $retvalue
+RET $retvalue
+PUSH 5
+CALL fibb
+POP ans
+PUSH 0
+POP ans

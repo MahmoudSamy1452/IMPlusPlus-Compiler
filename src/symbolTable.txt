@@ -1,0 +1,7 @@
+{
+name                Type                isConst             returnType          isUsed              
+z                   int                 0                   N/A                 0                   
+w                   int                 0                   N/A                 1                   
+x                   int                 0                   N/A                 1                   
+y                   int                 0                   N/A                 1                   
+}
